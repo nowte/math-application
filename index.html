@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <title>Üçgenin Yardımcı Elemanları</title>
 <style>
 :root{--bg:#f5f5f7;--card:#fff;--ink:#1d1d1f;--mute:#6e6e73;--line:#d2d2d7;--blue:#0071e3;--green:#30a14e;--orange:#ff9500;--purple:#af52de;--red:#ff3b30;
@@ -19,10 +21,10 @@ h1{font-size:clamp(28px,4.5vw,44px);letter-spacing:-.02em;margin:0 0 6px;font-we
 .tabs button{border:0;background:none;color:var(--ink);font:inherit;font-size:14px;font-weight:500;padding:8px 16px;border-radius:9px;cursor:pointer}
 .tabs button.on{background:var(--card);box-shadow:0 1px 4px rgba(0,0,0,.18)}
 .grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px}
-@media(max-width:860px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px),(max-width:860px) and (min-height:501px){.grid{grid-template-columns:1fr}}
 .card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .desc{font-size:15px;line-height:1.5;margin:0 0 12px}
-svg{width:100%;height:auto;display:block;touch-action:none;overflow:hidden;background:color-mix(in srgb,var(--bg) 60%,var(--card));border-radius:14px;user-select:none}
+svg{width:100%;height:auto;display:block;touch-action:pan-y;-webkit-touch-callout:none;overflow:hidden;background:color-mix(in srgb,var(--bg) 60%,var(--card));border-radius:14px;user-select:none}
 svg text{fill:var(--ink);font-family:inherit}
 .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
 .bar button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:13px;padding:6px 12px;border-radius:980px;cursor:pointer}
@@ -59,6 +61,79 @@ svg *{transition:none}
 .zm{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
 .zm button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 85%,transparent);color:var(--ink);font-size:18px;cursor:pointer;backdrop-filter:blur(8px)}
 .zm button:hover{color:var(--blue);border-color:var(--blue)}
+.why{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px;font-weight:600;padding:11px 14px;border-radius:12px;cursor:pointer;margin-bottom:8px}
+.why:last-child{margin-bottom:0}
+.why small{display:block;font-weight:400;font-size:12px;color:var(--mute);margin-top:2px}
+.why:hover{border-color:var(--blue);color:var(--blue)}
+.pf .pst{font-size:13px;color:var(--blue);font-weight:600;margin:4px 0}
+.pgs{display:flex;gap:4px;margin-bottom:10px}
+.pgs i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.pgs i.on{background:var(--blue)}
+.pcap{font-size:15px;line-height:1.55;margin:0 0 10px}
+.pbar{display:flex;gap:8px;margin-top:12px}
+.pbar button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:9px 8px;border-radius:980px;cursor:pointer}
+.pbar button[data-a=auto]{background:var(--blue);border-color:var(--blue);color:#fff}
+.pbar button:disabled{opacity:.4;cursor:default}
+.pclose{margin-top:10px;width:100%;border:0;background:none;color:var(--mute);font:inherit;font-size:13px;cursor:pointer;padding:6px}
+.fm{font-family:"Cambria Math","STIX Two Math","New York",ui-serif,Georgia,serif;font-size:15px}
+sub{font-size:.72em;line-height:0;vertical-align:baseline;position:relative;top:.28em}
+.tgw{border-bottom:1px solid var(--line)}
+.tg{border-bottom:0;gap:10px;justify-content:flex-start}
+.tg label{flex:1;cursor:pointer}
+.ib{flex:none;width:20px;height:20px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--mute);font:italic 600 12px Georgia,serif;line-height:1;cursor:pointer;padding:0}
+.ib:hover,.ib.on{color:var(--blue);border-color:var(--blue)}
+.itx{margin:0 0 10px;padding:9px 11px;background:var(--bg);border-radius:10px;font-size:13px;line-height:1.5;color:var(--mute)}
+.itx[hidden]{display:none}
+.slh{display:flex;align-items:center;gap:10px}.slh span{flex:1}
+.sl .itx{margin:8px 0 4px}
+.ft{border-top:1px solid var(--line);margin-top:8px}
+.ftin{max-width:1100px;margin:0 auto;padding:18px 20px calc(24px + env(safe-area-inset-bottom,0px));font-size:12px;line-height:1.5;color:var(--mute)}
+.ftin p{margin:0 0 4px}
+.ftin b{color:var(--ink);font-weight:600}
+html{-webkit-text-size-adjust:100%}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#sv{scroll-margin-top:10px}
+.row span{min-width:0}.row{gap:12px}
+.fm{overflow-wrap:anywhere}
+.pfh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.pfh h3{margin:0}
+.pclose{width:auto;margin:0;flex:none;border:1px solid var(--line);background:none;color:var(--mute);font:inherit;font-size:12px;cursor:pointer;padding:5px 11px;border-radius:980px}
+.pclose:hover{color:var(--blue);border-color:var(--blue)}
+.hint-t{display:none}
+.wrap{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media (pointer:coarse){
+  .hint-d{display:none}.hint-t{display:inline}
+  .ib{width:28px;height:28px;font-size:13px}
+  .sl input{height:34px}
+  .tg{padding:12px 0}
+}
+@media (max-width:600px){
+  .hint-d{display:none}.hint-t{display:inline}
+  .wrap{padding-top:18px;padding-bottom:28px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  h1{font-size:27px;padding-right:56px;line-height:1.12}
+  .sub{font-size:15px;margin-bottom:16px}
+  .theme{top:16px;right:max(14px,env(safe-area-inset-right,0px));width:40px;height:40px;padding:0;font-size:17px;display:grid;place-items:center}
+  .theme .tl{display:none}
+  .tabs{display:grid;grid-template-columns:repeat(4,1fr);width:100%;margin-bottom:14px}
+  .tabs button{padding:8px 2px;min-height:46px;font-size:13px;line-height:1.15;text-align:center}
+  .grid{gap:14px}
+  .card{padding:14px;border-radius:18px}
+  .desc{font-size:14px;margin-bottom:10px}
+  .zm{flex-direction:row;top:auto;bottom:8px;right:8px}
+  .zm button{width:40px;height:40px}
+  .bar{gap:8px;margin-top:12px}
+  .bar button{min-height:40px;font-size:13px;padding:8px 14px}
+  .chip{flex-basis:100%;margin:2px 0 0;order:5}
+  .hint{margin-top:6px}
+  .fc h3{font-size:12px}
+  .fm{font-size:14px}
+  .why{padding:13px 14px}
+  .pbar button{min-height:44px}
+  .ftin{padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  body.pfon #facts{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:18px 18px 0 0;max-height:46vh;max-height:46dvh;overflow:auto;padding:14px 16px 0;box-shadow:0 -8px 28px rgba(0,0,0,.28)}
+  body.pfon .wrap{padding-bottom:52vh}
+  .pf .pbar{position:sticky;bottom:0;background:var(--card);margin-top:8px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px))}
+}
 </style>
 </head>
 <body>
@@ -77,7 +152,7 @@ svg *{transition:none}
         <button data-p="dar">Dar açılı</button><button data-p="dik">Dik açılı</button><button data-p="genis">Geniş açılı</button><button data-p="esk">Eşkenar</button>
         <button id="play">▶ Hareket</button><span class="chip" id="chip"></span>
       </div>
-      <p class="hint">İpucu: A, B ve C noktalarını fare ya da parmakla sürükle.</p>
+      <p class="hint"><span class="hint-d">İpucu: A, B ve C noktalarını fare ile sürükle; tekerlek ya da + − ile yakınlaştır.</span><span class="hint-t">İpucu: A, B ve C köşelerini parmağınla sürükle. İki parmakla yakınlaştır ve kaydır. Sayfayı kaydırmak için çizimin boş yerine dokun.</span></p>
     </div>
     <div class="side">
       <div class="card" id="ctrls"></div>
@@ -85,14 +160,17 @@ svg *{transition:none}
     </div>
   </div>
 </div>
+<footer class="ft"><div class="ftin"><p><b>Üçgenin Yardımcı Elemanları</b> · ahmet emin aydın tarafından hazırlanmıştır.</p><p>Telif Hakkı © 2026 nowtes a.k.a ahmet emin aydın . Tüm hakları saklıdır.</p></div></footer>
 <script>
 const $=s=>document.querySelector(s);
-const W=640,H=460,U=40;
+const U=40;const mqN=matchMedia('(max-width:600px)');let W=mqN.matches?400:640,H=mqN.matches?440:460;
 const PR={dar:[[260,70],[110,380],[540,340]],dik:[[150,100],[150,370],[500,370]],genis:[[200,200],[90,370],[560,370]],esk:[[320,50],[120,396],[520,396]]};
-let P=PR.dar.map(([x,y])=>({x,y})),mode='bis',tt=70,gt=60,anim=true,playing=0;
-let vb={x:0,y:0,w:640,h:460},FIT=[],pan=null;const zs=()=>Math.max(1,vb.w/640);
+const PRM={dar:[[190,60],[50,370],[350,330]],dik:[[70,70],[70,360],[340,360]],genis:[[190,230],[30,360],[370,360]],esk:[[200,90],[50,349.8],[350,349.8]]};
+const curPR=()=>mqN.matches?PRM:PR;
+let P=curPR().dar.map(([x,y])=>({x,y})),mode='bis',tt=70,gt=60,anim=true,playing=0;
+let vb={x:0,y:0,w:W,h:H},FIT=[],pan=null;const zs=()=>Math.max(1,vb.w/W);
 const on={bis:{inc:1,thm:1,arc:1,pg:1,ex:0,exc:0},med:{ratio:1,area:0,mid:0},per:{circ:1,eq:1,pt:1},alt:{ext:1,orth:0}};
-const TG={bis:[['inc','İç teğet çember'],['thm','Açıortay teoremi (A köşesi)'],['arc','Eş açıları göster'],['pg','Açıortay üzerinde G noktası'],['ex','Dış açıortay (A köşesi)'],['exc','Dış teğet çemberler']],med:[['ratio','2 : 1 oranı'],['area','Altı eş alan'],['mid','Orta üçgen']],per:[['circ','Çevrel çember'],['eq','Köşelere eşit uzaklık'],['pt','Orta dik üzerinde P noktası']],alt:[['ext','Ayaklar ve dik açı işareti'],['orth','Ortodik üçgen']]};
+const TG={bis:[['inc','İç teğet çember'],['thm','Açıortay teoremi (A köşesi)'],['arc','Eş açıları göster'],['pg','Açıortay üzerinde P noktası'],['ex','Dış açıortay (A köşesi)'],['exc','Dış teğet çemberler']],med:[['ratio','2 : 1 oranı'],['area','Altı eş alan'],['mid','Orta üçgen']],per:[['circ','Çevrel çember'],['eq','Köşelere eşit uzaklık'],['pt','Orta dik üzerinde P noktası']],alt:[['ext','Ayaklar ve dik açı işareti'],['orth','Ortodik üçgen']]};
 const DEF={bis:'Açıortay: Bir açıyı iki eş açıya ayıran ışındır. Üç iç açıortay, iç teğet çemberin merkezi olan I noktasında kesişir.',
 med:'Kenarortay: Bir köşeyi karşı kenarın orta noktasına birleştiren doğru parçasıdır. Üçü ağırlık merkezi G noktasında kesişir.',
 per:'Kenar orta dikme: Bir kenarın orta noktasından geçen ve kenara dik olan doğrudur. Üçü çevrel çemberin merkezi O noktasında kesişir.',
@@ -106,9 +184,10 @@ function foot(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,t=((p.x-a.x)*dx+(p.y-a.y)*dy)/(
 function circ(A,B,C){const D=2*(A.x*(B.y-C.y)+B.x*(C.y-A.y)+C.x*(A.y-B.y)),a=A.x**2+A.y**2,b=B.x**2+B.y**2,c=C.x**2+C.y**2;return{x:(a*(B.y-C.y)+b*(C.y-A.y)+c*(A.y-B.y))/D,y:(a*(C.x-B.x)+b*(A.x-C.x)+c*(B.x-A.x))/D}}
 const f=(x,n=2)=>(+x).toFixed(n).replace('.',',');
 const ang=(a,b,c)=>Math.acos(Math.max(-1,Math.min(1,(b*b+c*c-a*a)/(2*b*c))))*180/Math.PI;
+const angAt=(V,p,q)=>{const u=unit(V,p),w=unit(V,q);return Math.acos(Math.max(-1,Math.min(1,u.x*w.x+u.y*w.y)))*180/Math.PI};
 const ln=(p,q,c,w=2,da='')=>`<line x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}" stroke="${c}" stroke-width="${w}" ${da?`stroke-dasharray="${da}"`:''} stroke-linecap="round" ${!da&&anim?'class="dl" pathLength="1"':''}/>`;
 const dot=(p,c,r=4.5)=>`<circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${c}" class="${anim?'fi':''}"/>`;
-const tx=(p,s,c='var(--mute)',dx=0,dy=0)=>`<text x="${p.x+dx}" y="${p.y+dy}" fill="${c}" font-size="${14*zs()}" font-weight="600" text-anchor="middle" style="fill:${c}">${s}</text>`;
+const tx=(p,s,c='var(--mute)',dx=0,dy=0)=>`<text x="${p.x+dx}" y="${p.y+dy}" fill="${c}" font-size="${(mqN.matches?16:14)*zs()}" font-weight="600" text-anchor="middle" style="fill:${c}">${svgSub(s)}</text>`;
 const poly=(pts,fill,stroke='none',op=1,da='')=>`<polygon points="${pts.map(p=>p.x+','+p.y).join(' ')}" fill="${fill}" fill-opacity="${op}" stroke="${stroke}" stroke-width="2" stroke-linejoin="round" class="${anim?'fi':''}" ${da?`stroke-dasharray="${da}"`:''}/>`;
 const arc=(V,u1,u2,r,c)=>{const s=u1.x*u2.y-u1.y*u2.x>0?1:0;return `<path d="M${V.x+u1.x*r} ${V.y+u1.y*r}A${r} ${r} 0 0 ${s} ${V.x+u2.x*r} ${V.y+u2.y*r}" fill="none" stroke="${c}" stroke-width="2"/>`};
 const sq=(V,u,n,s,c='var(--mute)')=>`<path d="M${V.x+u.x*s} ${V.y+u.y*s}L${V.x+(u.x+n.x)*s} ${V.y+(u.y+n.y)*s}L${V.x+n.x*s} ${V.y+n.y*s}" fill="none" stroke="${c}" stroke-width="1.6"/>`;
@@ -116,7 +195,81 @@ const row=(l,v)=>`<div class="row"><span>${l}</span><b>${v}</b></div>`;
 const card=(t,b)=>`<div class="fc"><h3>${t}</h3>${b}</div>`;
 const fm=s=>`<p class="fm">${s}</p>`;
 const note=s=>`<p class="note">${s}</p>`;
+function fmtTxt(s){return s.replace(/([A-Za-zα-ωΑ-Ω])_([a-z0-9]+)/g,'$1<sub>$2</sub>').replace(/([A-Za-z])ₐ/g,'$1<sub>a</sub>').replace(/M([bc])(?![a-zçğıöşü])/g,'M<sub>$1</sub>')}
+function subH(h){return h.replace(/(<[^>]*>)|([^<]+)/g,(m,t,x)=>t||fmtTxt(x))}
+function svgSub(s){const r=(m,a,b)=>a+`<tspan dy="3" font-size="0.72em">${b}</tspan><tspan dy="-3">​</tspan>`;return String(s).replace(/([A-Za-z])_([a-z0-9]+)/g,r).replace(/([A-Za-z])ₐ/g,(m,a)=>r(m,a,'a'))}
 const BL='var(--blue)',GR='var(--green)',OR='var(--orange)',PU='var(--purple)';
+
+/* ===== "Neden?" ispat modu ===== */
+let pf=null,pfTimer=0;
+const pfH=(t,p,I)=>sq(t,unit(t,p),unit(t,I),8);
+const pbis=(p,q,c,w=2)=>{const M=mid(p,q),u=unit(p,q),n={x:-u.y,y:u.x};return ln({x:M.x-n.x*4000,y:M.y-n.y*4000},{x:M.x+n.x*4000,y:M.y+n.y*4000},c,w)};
+const bisD=x=>lerp(x.B,x.C,x.c/(x.b+x.c));
+const incI=x=>({x:(x.a*x.A.x+x.b*x.B.x+x.c*x.C.x)/(x.a+x.b+x.c),y:(x.a*x.A.y+x.b*x.B.y+x.c*x.C.y)/(x.a+x.b+x.c)});
+const cir=(O,r,c,da,fl)=>`<circle cx="${O.x}" cy="${O.y}" r="${r}" fill="${fl||'none'}" fill-opacity=".08" stroke="${c}" stroke-width="1.8" ${da?`stroke-dasharray="${da}"`:''} class="${anim?'fi':''}"/>`;
+const PF={
+ bis1:{mode:'bis',title:'Açıortay teoremi',goal:'|BD| / |DC| = c / b',steps:[
+  {t:'AD, A açısının açıortayı olsun ve BC kenarını D noktasında kessin. Kanıtlayacağımız şey: |BD| / |DC| = c / b.',
+   d:x=>{const D=bisD(x),u1=unit(x.A,x.B),ux=unit(x.A,D),u2=unit(x.A,x.C);return ln(x.A,D,OR)+arc(x.A,u1,ux,24,OR)+arc(x.A,u1,ux,29,OR)+arc(x.A,ux,u2,24,OR)+arc(x.A,ux,u2,29,OR)+dot(D,OR)+tx(D,'D',OR,0,-12)}},
+  {t:'ABD ve ADC üçgenlerinin A köşesinden BC’ye inen yüksekliği ortaktır (h). Bu yüzden alanlarının oranı tabanlarının oranına eşittir: Alan(ABD) / Alan(ADC) = |BD| / |DC|.',
+   d:x=>{const D=bisD(x),Ha=foot(x.A,x.B,x.C);return poly([x.A,x.B,D],GR,'none',.22)+poly([x.A,D,x.C],PU,'none',.22)+ln(x.A,Ha,'var(--mute)',2,'5 4')+sq(Ha,unit(Ha,x.C),unit(Ha,x.A),8)+tx(mid(x.A,Ha),'h','var(--mute)',-10,0)+ln(x.B,D,GR,6)+ln(D,x.C,PU,6)}},
+  {t:'D noktası açıortay üzerinde olduğundan AB ve AC kenarlarına eşit uzaklıktadır (r). Aynı üçgenlere bu kez AB ve AC tabanlarından bakalım: yükseklikler r, tabanlar c ve b. Alan(ABD) / Alan(ADC) = (c·r) / (b·r) = c / b.',
+   d:x=>{const D=bisD(x),Fd=foot(D,x.A,x.B),Ed=foot(D,x.A,x.C);return ln(D,Fd,OR,2)+ln(D,Ed,OR,2)+pfH(Fd,x.A,D)+pfH(Ed,x.A,D)+dot(Fd,OR,3.5)+dot(Ed,OR,3.5)+tx(mid(D,Fd),'r',OR,-10,0)+tx(mid(D,Ed),'r',OR,10,0)}},
+  {t:'Aynı alan oranı iki farklı yoldan bulundu, o halde |BD| / |DC| = c / b. ∎',
+   d:x=>{const D=bisD(x);return tx(mid(x.B,D),'|BD|',GR,0,24)+tx(mid(D,x.C),'|DC|',PU,0,24)},
+   n:x=>{const D=bisD(x);return row('|BD| / |DC|',f(d(x.B,D)/d(D,x.C)))+row('c / b',f(x.c/x.b))}}]},
+ bis2:{mode:'bis',title:'İç teğet çemberin merkezi I',goal:'I, üç kenara da eşit uzaktır',steps:[
+  {t:'A ve B köşelerinin açıortayları I noktasında kesişsin. I’nın üç kenara da eşit uzak olduğunu göstereceğiz.',
+   d:x=>{const D=bisD(x),E=lerp(x.A,x.C,x.c/(x.c+x.a)),I=incI(x);return ln(x.A,D,OR)+ln(x.B,E,OR)+dot(I,BL,6)+tx(I,'I',BL,12,-10)}},
+  {t:'I, A açıortayı üzerinde olduğundan AB ve AC kenarlarına eşit uzaktır.',
+   d:x=>{const I=incI(x),t1=foot(I,x.A,x.B),t2=foot(I,x.A,x.C);return ln(I,t1,GR,2,'4 4')+ln(I,t2,GR,2,'4 4')+pfH(t1,x.A,I)+pfH(t2,x.A,I)+dot(t1,GR,3.5)+dot(t2,GR,3.5)},
+   n:x=>{const I=incI(x);return row('I → AB',f(d(I,foot(I,x.A,x.B))/U))+row('I → AC',f(d(I,foot(I,x.A,x.C))/U))}},
+  {t:'I, B açıortayı üzerinde olduğundan BA ve BC kenarlarına da eşit uzaktır. Böylece I, üç kenara da aynı uzaklıktadır.',
+   d:x=>{const I=incI(x),t3=foot(I,x.B,x.C);return ln(I,t3,PU,2,'4 4')+pfH(t3,x.B,I)+dot(t3,PU,3.5)},
+   n:x=>{const I=incI(x);return row('I → AB',f(d(I,foot(I,x.A,x.B))/U))+row('I → AC',f(d(I,foot(I,x.A,x.C))/U))+row('I → BC',f(d(I,foot(I,x.B,x.C))/U))}},
+  {t:'Üç uzaklık da eşit (r). C köşesinin kollarına da eşit uzak olduğu için I, C açıortayı üzerindedir: üç açıortay I’da kesişir. I merkezli, r yarıçaplı çember üç kenara teğettir. ∎',
+   d:x=>{const I=incI(x),F=lerp(x.A,x.B,x.b/(x.a+x.b));return ln(x.C,F,OR)+cir(I,x.K/((x.a+x.b+x.c)/2),BL,'',BL)+dot(I,BL,6)}}]},
+ med1:{mode:'med',title:'Kenarortaylar 2 : 1 böler',goal:'|BG| : |GMb| = 2 : 1',steps:[
+  {t:'BMb ve CMc kenarortayları G noktasında kesişsin. Mb ve Mc orta noktalarını birleştirelim.',
+   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return ln(x.B,Mb,GR)+ln(x.C,Mc,GR)+ln(Mb,Mc,PU,3)+dot(Mb,GR)+dot(Mc,GR)+tx(Mb,'M_b',GR,22,4)+tx(Mc,'M_c',GR,-24,4)+dot(x.G,BL,6)+tx(x.G,'G',BL,14,-10)}},
+  {t:'ABC üçgeninde Mb ve Mc kenar orta noktalarıdır. Orta taban teoremine göre MbMc ∥ BC ve |MbMc| = |BC| / 2.',
+   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return ln(x.B,x.C,BL,5)+tx(mid(x.B,x.C),'a',BL,0,24)+tx(mid(Mb,Mc),'a/2',PU,0,-10)},
+   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|MbMc|',f(d(Mb,Mc)/U))+row('a / 2',f(x.a/2/U))}},
+  {t:'MbMc ∥ BC olduğundan ters açılar eşittir: GBC ve GMbMc üçgenleri benzerdir. Benzerlik oranı |BC| / |MbMc| = 2.',
+   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return poly([x.G,x.B,x.C],BL,'none',.2)+poly([x.G,Mc,Mb],OR,'none',.4)},
+   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|BC| / |MbMc|',f(x.a/d(Mb,Mc)))}},
+  {t:'Benzerlikten |GB| = 2·|GMb| ve |GC| = 2·|GMc|. Aynı işlem A’dan çıkan kenarortay için de yapılırsa BMb’yi B’den itibaren yine 2 : 1 bölen tek nokta bulunur: bu da G’dir. Üç kenarortay G’de kesişir ve her biri köşeden itibaren 2 : 1 bölünür. ∎',
+   d:x=>{const Mb=mid(x.A,x.C),Ma=mid(x.B,x.C);return ln(x.A,Ma,GR)+dot(Ma,GR)+tx(Ma,'Mₐ',GR,0,22)+ln(x.B,x.G,BL,7)+ln(x.G,Mb,OR,7)+tx(mid(x.B,x.G),'2k',BL,-16,0)+tx(mid(x.G,Mb),'k',OR,16,0)},
+   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|GB| / |GMb|',f(d(x.G,x.B)/d(x.G,Mb)))+row('|GC| / |GMc|',f(d(x.G,x.C)/d(x.G,Mc)))}}]},
+ per1:{mode:'per',title:'Orta dikme ve çevrel merkez',goal:'P orta dik üzerinde ⇒ |PB| = |PC|',steps:[
+  {t:'BC kenarının orta noktası M olsun; orta dikme M’den dik olarak geçer. Üzerinde herhangi bir P noktası alalım. Kanıtlayacağımız şey: |PB| = |PC|.',
+   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return pbis(x.B,x.C,OR)+sq(M,u,n,9)+dot(M,OR)+tx(M,'M',OR,0,22)+dot(Pt,GR,5.5)+tx(Pt,'P',GR,14,-8)}},
+  {t:'PMB ve PMC üçgenlerine bakalım: |BM| = |MC| (M orta nokta), |PM| ortak kenar, ∠PMB = ∠PMC = 90°. Kenar–açı–kenar eşliğine göre iki üçgen eştir.',
+   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return poly([Pt,M,x.B],GR,'none',.25)+poly([Pt,M,x.C],PU,'none',.25)+ln(x.B,M,GR,6)+ln(M,x.C,PU,6)}},
+  {t:'Eş üçgenlerde karşılıklı kenarlar eşittir: |PB| = |PC|. Yani orta dik üzerindeki her nokta B ve C’ye eşit uzaktır.',
+   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return ln(Pt,x.B,GR,2.5)+ln(Pt,x.C,PU,2.5)},
+   n:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return row('|PB|',f(d(Pt,x.B)/U))+row('|PC|',f(d(Pt,x.C)/U))}},
+  {t:'Tersi de doğrudur: B ve C’ye eşit uzak her nokta orta dikmenin üzerindedir. AB ve BC orta dikmeleri O’da kesişsin: |OA| = |OB| ve |OB| = |OC| olduğundan |OA| = |OC|; yani O, AC’nin orta dikmesi üzerindedir. Üç orta dikme O’da kesişir ve O, çevrel çemberin merkezidir. ∎',
+   d:x=>{const O=circ(x.A,x.B,x.C);FIT.push(O);return pbis(x.A,x.B,OR)+pbis(x.A,x.C,OR)+cir(O,d(O,x.A),BL,'',BL)+ln(O,x.A,PU,1.8,'6 5')+ln(O,x.B,PU,1.8,'6 5')+ln(O,x.C,PU,1.8,'6 5')+dot(O,BL,6)+tx(O,'O',BL,14,-10)},
+   n:x=>{const O=circ(x.A,x.B,x.C);return row('|OA|',f(d(O,x.A)/U))+row('|OB|',f(d(O,x.B)/U))+row('|OC|',f(d(O,x.C)/U))}}]},
+ alt1:{mode:'alt',title:'Yükseklikler tek noktada kesişir',goal:'Üç yükseklik H noktasında kesişir',steps:[
+  {t:'Her köşeden karşı kenara paralel çizelim. Bu doğrular A′B′C′ adlı büyük bir üçgen oluşturur. Küçük üçgenimiz bunun içinde kalır.',
+   d:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y};FIT.push(A2,B2,C2);
+     const G0=x.G,l=(V,s2)=>{const u=unit(G0,V);return tx(V,s2,PU,u.x*22,u.y*22+5)};
+     return poly([A2,B2,C2],'none',PU,1,'7 5')+l(A2,'A′')+l(B2,'B′')+l(C2,'C′')}},
+  {t:'ABCB′ ve ACBC′ birer paralelkenardır; bu yüzden |B′A| = |BC| = |AC′|. Yani A, B′C′ kenarının orta noktasıdır. Aynı şekilde B ve C de A′C′ ve A′B′ kenarlarının orta noktalarıdır.',
+   d:x=>{const {A,B,C}=x,B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y};return ln(B2,A,GR,6)+ln(A,C2,OR,6)+dot(A,PU,5)}},
+  {t:'AD ⟂ BC ve BC ∥ B′C′ olduğundan AD ⟂ B′C′ olur. Demek ki AD, B′C′ kenarının orta dikmesidir. Aynı şekilde BE ve CF de diğer kenarların orta dikmeleridir.',
+   d:x=>{const {A,B,C}=x,C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},Dd=foot(A,B,C),Ee=foot(B,A,C),Ff=foot(C,A,B);
+     return ln(A,Dd,GR,2.5)+ln(B,Ee,GR,2.5)+ln(C,Ff,GR,2.5)+sq(A,unit(A,C2),unit(A,Dd),9)+sq(B,unit(B,C2),unit(B,Ee),9)+sq(C,unit(C,B2),unit(C,Ff),9)}},
+  {t:'Üç yükseklik, A′B′C′ üçgeninin üç kenar orta dikmesidir. Bir üçgenin orta dikmeleri tek noktada (çevrel çember merkezi) kesiştiğinden yükseklikler de tek noktada kesişir: bu nokta H’dır. ∎',
+   d:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},H=circ(A2,B2,C2);FIT.push(H);
+     return ln(A,H,GR,2,'5 4')+ln(B,H,GR,2,'5 4')+ln(C,H,GR,2,'5 4')+cir(H,d(H,A2),PU,'6 5',PU)+dot(H,BL,6)+tx(H,'H',BL,14,-10)},
+   n:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},H=circ(A2,B2,C2);return row('|HA′|',f(d(H,A2)/U))+row('|HB′|',f(d(H,B2)/U))+row('|HC′|',f(d(H,C2)/U))}}]}
+};
+const whyCard=m=>card('Neden böyle?',Object.entries(PF).filter(([k,v])=>v.mode===m).map(([k,v])=>`<button class="why" data-pf="${k}">▶ ${v.title}<small>İspatı adım adım izle</small></button>`).join(''));
+const pfPanel=(D0,st,x)=>{const n=D0.steps.length,run=pfTimer&&pf.st<n-1;
+  return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs">${D0.steps.map((_,i)=>`<i class="${i<=pf.st?'on':''}"></i>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
 
 function draw(){
   const [A,B,C]=P,a=d(B,C),b=d(A,C),c=d(A,B),K=area(A,B,C),Ku=K/(U*U),au=a/U,bu=b/U,cu=c/U;
@@ -126,7 +279,10 @@ function draw(){
   $('#chip').textContent=kind;
   const G={x:(A.x+B.x+C.x)/3,y:(A.y+B.y+C.y)/3};
   FIT=[...P];let s=poly(P,'var(--ink)','var(--ink)',.05),h='';
-  if(mode==='bis'){
+  if(pf){const D0=PF[pf.id],cx={A,B,C,a,b,c,G,K},aw=anim;
+    for(let i=0;i<=pf.st;i++){anim=aw&&i===pf.st;s+=D0.steps[i].d(cx)}
+    anim=aw;h=pfPanel(D0,D0.steps[pf.st],cx)}
+  if(!pf&&mode==='bis'){
     const o=on.bis,D=lerp(B,C,c/(b+c)),E=lerp(A,C,c/(c+a)),F=lerp(A,B,b/(a+b));
     const I={x:(a*A.x+b*B.x+c*C.x)/(a+b+c),y:(a*A.y+b*B.y+c*C.y)/(a+b+c)},r=K/((a+b+c)/2);
     if(o.thm){s+=ln(B,D,GR,7)+ln(D,C,PU,7)+tx(mid(B,D),'|BD|',GR,0,24)+tx(mid(D,C),'|DC|',PU,0,24)}
@@ -138,8 +294,8 @@ function draw(){
     s+=dot(I,BL,6)+tx(I,'I',BL,12,-10)+dot(D,OR)+tx(D,'D',OR,0,-12);
     let bx='';
     if(o.pg){const Gp=lerp(A,D,gt/100),Fp=foot(Gp,A,B),Ep=foot(Gp,A,C);
-      s+=ln(A,Fp,GR,3)+ln(A,Ep,GR,3)+ln(Gp,Fp,PU,2)+ln(Gp,Ep,PU,2)+sq(Fp,unit(Fp,A),unit(Fp,Gp),8,PU)+sq(Ep,unit(Ep,A),unit(Ep,Gp),8,PU)+dot(Gp,PU,5.5)+tx(Gp,'G',PU,14,-8)+tx(Fp,'F',GR,0,18)+tx(Ep,'E',GR,0,-10);
-      bx+=card('Açıortay üzerindeki nokta',fm('|GF| = |GE| ve |AF| = |AE|')+row('|GF|',f(d(Gp,Fp)/U))+row('|GE|',f(d(Gp,Ep)/U))+row('|AF|',f(d(A,Fp)/U))+row('|AE|',f(d(A,Ep)/U))+note('Açıortay üzerindeki her nokta, açının kollarına eşit uzaklıktadır.'))}
+      s+=ln(A,Fp,GR,3)+ln(A,Ep,GR,3)+ln(Gp,Fp,PU,2)+ln(Gp,Ep,PU,2)+sq(Fp,unit(Fp,A),unit(Fp,Gp),8,PU)+sq(Ep,unit(Ep,A),unit(Ep,Gp),8,PU)+dot(Gp,PU,5.5)+tx(Gp,'P',PU,14,-8)+tx(Fp,'K',GR,0,18)+tx(Ep,'L',GR,0,-10);
+      bx+=card('Açıortay üzerindeki nokta',fm('|PK| = |PL|  ve  |AK| = |AL|')+row('|PK|',f(d(Gp,Fp)/U))+row('|PL|',f(d(Gp,Ep)/U))+row('|AK|',f(d(A,Fp)/U))+row('|AL|',f(d(A,Ep)/U))+note('P, açıortay üzerinde seçtiğin herhangi bir noktadır. K ve L, P’den AB ve AC’ye inen dikmelerin ayaklarıdır. Açıortay üzerindeki her nokta açının iki koluna eşit uzaktır.'))}
     if(o.ex){const ui=unit(A,D),ue={x:-ui.y,y:ui.x};
       s+=ln({x:A.x-ue.x*4000,y:A.y-ue.y*4000},{x:A.x+ue.x*4000,y:A.y+ue.y*4000},PU,2);
       if(Math.abs(b-c)>2){const Ex={x:(b*B.x-c*C.x)/(b-c),y:(b*B.y-c*C.y)/(b-c)};
@@ -151,14 +307,14 @@ function draw(){
       const xs=[[Ia,K/(sp-a),'Iₐ'],[Ib,K/(sp-b),'I_b'],[Ic,K/(sp-c),'I_c']];
       xs.forEach(([Q,rr,nm])=>{FIT.push(Q);s+=`<circle cx="${Q.x}" cy="${Q.y}" r="${rr}" fill="${PU}" fill-opacity=".06" stroke="${PU}" stroke-width="1.8" stroke-dasharray="6 5" class="${anim?'fi':''}"/>`+dot(Q,PU,4)+tx(Q,nm,PU,0,-10)});
       s+=ln(A,Ia,PU,1.5,'5 4')+ln(B,Ia,PU,1.5,'5 4')+ln(C,Ia,PU,1.5,'5 4');
-      bx+=card('Dış teğet çemberler',fm('rₐ = Alan / (s − a)')+row('rₐ',f(xs[0][1]/U))+row('r_b',f(xs[1][1]/U))+row('r_c',f(xs[2][1]/U))+note('İki dış açıortay ile dış açılara komşu olmayan iç açının açıortayı Iₐ’da kesişir. Bir üçgenin üç dış teğet çemberi vardır.'))}
+      bx+=card('Dış teğet çemberler',fm('r_a = Alan / (s − a)')+row('r_a',f(xs[0][1]/U))+row('r_b',f(xs[1][1]/U))+row('r_c',f(xs[2][1]/U))+row('Ölçülen: I_a → BC',f(d(Ia,foot(Ia,B,C))/U))+note('I_a, A köşesindeki iç açıortay ile B ve C köşelerindeki dış açıortayların kesişimidir. Bir üçgenin üç dış teğet çemberi vardır.'))}
     const BD=d(B,D)/U,DC=d(D,C)/U,Va=Math.sqrt(bu*cu*(1-au*au/((bu+cu)**2))),hA=gA/2;
     h=card('Açıortay teoremi',fm('|BD| / |DC| = c / b')+row('|BD| / |DC|',f(BD/DC))+row('c / b',f(cu/bu)))+
       card('Açıortay uzunluğu',fm('Vₐ = √( b·c·(1 − a² / (b+c)²) )')+row('Formülden Vₐ',f(Va))+row('Ölçülen |AD|',f(d(A,D)/U)))+
-      card('İç teğet çember',fm('r = Alan / s  ( s = çevre / 2 )')+row('r',f(r/U))+note('I noktası üç kenara da eşit uzaklıktadır (r).'))+
-      card('Açı bağıntıları',row('∠BAD = ∠DAC',f(hA,1)+'°')+row('∠BIC',f(180-(gB+gC)/2,1)+'°')+row('90° + A/2',f(90+gA/2,1)+'°'))+bx
+      card('İç teğet çember',fm('r = Alan / s  ( s = çevre / 2 )')+row('r (formül)',f(r/U))+row('Ölçülen: I → AB',f(d(I,foot(I,A,B))/U))+row('Ölçülen: I → BC',f(d(I,foot(I,B,C))/U))+row('Ölçülen: I → CA',f(d(I,foot(I,C,A))/U))+note('I noktası üç kenara da eşit uzaklıktadır (r).'))+
+      card('Açı bağıntıları',fm('∠BAD = ∠DAC = A / 2  ve  ∠BIC = 90° + A / 2')+row('∠BAD (ölçülen)',f(angAt(A,B,D),1)+'°')+row('∠DAC (ölçülen)',f(angAt(A,D,C),1)+'°')+row('∠BIC (ölçülen)',f(angAt(I,B,C),1)+'°')+row('90° + A/2 (formül)',f(90+gA/2,1)+'°'))+bx
   }
-  if(mode==='med'){
+  if(!pf&&mode==='med'){
     const o=on.med,Ma=mid(B,C),Mb=mid(A,C),Mc=mid(A,B);
     if(o.area){const cl=[BL,GR,OR,PU,'var(--red)','#5ac8fa'];[[A,Mc],[Mc,B],[B,Ma],[Ma,C],[C,Mb],[Mb,A]].forEach(([p,q],i)=>s+=poly([p,q,G],cl[i],'none',.35))}
     if(o.mid)s+=poly([Ma,Mb,Mc],'none',PU,1,'6 5');
@@ -170,14 +326,14 @@ function draw(){
     let rt='';
     if(isR){const i=[gA,gB,gC].findIndex(g=>Math.abs(g-90)<2),V=P[i],[p1,q1]=P.filter((_,j)=>j!==i),Mh=mid(p1,q1);
       s+=`<circle cx="${Mh.x}" cy="${Mh.y}" r="${d(p1,q1)/2}" fill="none" stroke="${PU}" stroke-width="1.8" stroke-dasharray="6 5"/>`;
-      rt=card('Dik üçgende',fm('|AD| = |BD| = |CD| = hipotenüs / 2')+row('Dik köşeden kenarortay',f(d(V,Mh)/U))+row('Hipotenüs / 2',f(d(p1,q1)/2/U))+note('Hipotenüsün orta noktası üç köşeye de eşit uzaklıktadır.'))}
+      rt=card('Dik üçgende',fm('Dik köşeden inen kenarortay = hipotenüs / 2')+row('Dik köşeden kenarortay',f(d(V,Mh)/U))+row('Hipotenüs / 2',f(d(p1,q1)/2/U))+note('Hipotenüsün orta noktası üç köşeye de eşit uzaklıktadır.'))}
     h=card('Kenarortay uzunluğu',fm('mₐ = ½ · √(2b² + 2c² − a²)')+row('Formülden mₐ',f(ma))+row('Ölçülen |AMₐ|',f(d(A,Ma)/U)))+
       card('Ağırlık merkezi G',fm('|AG| : |GMₐ| = 2 : 1')+row('|AG|',f(d(A,G)/U))+row('|GMₐ|',f(d(G,Ma)/U))+row('Oran',f(d(A,G)/d(G,Ma))+' : 1')+note('G = (A + B + C) / 3 ; her kenarortayı köşeden itibaren 2 : 1 böler.'))+
-      card('Alan özelliği',fm('Her kenarortay alanı iki eşit parçaya böler')+row('Alan(ABC)',f(Ku))+row('Altı üçgenden her biri',f(Ku/6))+note('Üçgen, kenarortaylarla 6 eş alanlı parçaya ayrılır.'))+
+      card('Alan özelliği',fm('Her kenarortay alanı iki eşit parçaya böler')+row('Alan(ABC)',f(Ku))+row('Alan(ABC) / 6',f(Ku/6))+row('Ölçülen: Alan(A M_c G)',f(area(A,Mc,G)/(U*U)))+row('Ölçülen: Alan(C M_b G)',f(area(C,Mb,G)/(U*U)))+note('Üçgen, kenarortaylarla 6 eş alanlı parçaya ayrılır.'))+
       card('Apollonius bağıntısı',fm('mₐ² + m_b² + m_c² = ¾ (a² + b² + c²)')+row('Sol taraf',f(ma*ma+mb*mb+mc*mc))+row('Sağ taraf',f(.75*(au*au+bu*bu+cu*cu))))+
       rt
   }
-  if(mode==='per'){
+  if(!pf&&mode==='per'){
     const o=on.per,O=circ(A,B,C),R=d(O,A),Ms=[mid(B,C),mid(A,C),mid(A,B)],sd=[[B,C],[A,C],[A,B]];
     if(o.circ)s+=`<circle cx="${O.x}" cy="${O.y}" r="${R}" fill="${BL}" fill-opacity=".05" stroke="${BL}" stroke-width="2"/>`;
     sd.forEach(([p,q],i)=>{const u=unit(p,q),n={x:-u.y,y:u.x},M=Ms[i];
@@ -191,7 +347,7 @@ function draw(){
       card('Çevrel çember yarıçapı',fm('R = a·b·c / (4·Alan)')+row('R (formül)',f(au*bu*cu/(4*Ku)))+row('R = a / (2·sin A)',f(au/(2*Math.sin(gA*Math.PI/180))))+row('Ölçülen R',f(R/U)))+
       card('O’nun konumu',row('Üçgen türü',kind)+note(isR?'Dik üçgende O, hipotenüsün orta noktasıdır.':isO?'Geniş açılı üçgende O, üçgenin dışındadır.':'Dar açılı üçgende O, üçgenin içindedir.'))
   }
-  if(mode==='alt'){
+  if(!pf&&mode==='alt'){
     const o=on.alt,O=circ(A,B,C),Hp={x:A.x+B.x+C.x-2*O.x,y:A.y+B.y+C.y-2*O.y};
     const sets=[[A,B,C,'D'],[B,A,C,'E'],[C,A,B,'F']],ft=sets.map(([V,p,q])=>foot(V,p,q));
     if(o.orth)s+=poly(ft,PU,PU,.1,'6 5');
@@ -205,32 +361,70 @@ function draw(){
     let ex='';
     if(!isR&&!isO&&d(Hp,B)>3&&d(Hp,C)>3){const v1={x:B.x-Hp.x,y:B.y-Hp.y},v2={x:C.x-Hp.x,y:C.y-Hp.y};const g=Math.acos((v1.x*v2.x+v1.y*v2.y)/(Math.hypot(v1.x,v1.y)*Math.hypot(v2.x,v2.y)))*180/Math.PI;
       ex=card('Açı bağıntısı (dar açılı)',fm('∠BHC = 180° − A')+row('∠BHC',f(g,1)+'°')+row('180° − A',f(180-gA,1)+'°'))}
-    h=card('Yükseklik uzunluğu',fm('hₐ = 2·Alan / a')+row('hₐ',f(hs[0]))+row('h_b',f(hs[1]))+row('h_c',f(hs[2])))+
-      card('Alan bağıntısı',fm('a·hₐ = b·h_b = c·h_c = 2·Alan')+row('a·hₐ',f(au*hs[0]))+row('b·h_b',f(bu*hs[1]))+row('c·h_c',f(cu*hs[2]))+row('2·Alan',f(2*Ku)))+
+    h=card('Yükseklik uzunluğu',fm('hₐ = 2·Alan / a')+row('h_a (formül)',f(hs[0]))+row('Ölçülen |AD|',f(d(A,ft[0])/U))+row('h_b (formül)',f(hs[1]))+row('Ölçülen |BE|',f(d(B,ft[1])/U))+row('h_c (formül)',f(hs[2]))+row('Ölçülen |CF|',f(d(C,ft[2])/U)))+
+      card('Alan bağıntısı',fm('a·hₐ = b·h_b = c·h_c = 2·Alan')+row('a · |AD|',f(au*d(A,ft[0])/U))+row('b · |BE|',f(bu*d(B,ft[1])/U))+row('c · |CF|',f(cu*d(C,ft[2])/U))+row('2·Alan',f(2*Ku)))+
       card('Diklik merkezi H',row('H’nin konumu',pos)+note('Geniş açılı üçgende yükseklikler kenarların uzantılarına iner (kesikli çizgiler).'))+ex+
       card('Özel durum',note('İkizkenar üçgende tabana ait yükseklik; açıortay, kenarortay ve kenar orta dikmeyle çakışır. Eşkenar üçgende dört elemanın hepsi çakışır; “Eşkenar” düğmesini dene.'))
   }
+  if(!pf)h=whyCard(mode)+h;
   const lab=(V,s2)=>{const u=unit(G,V);return tx(V,s2,'var(--ink)',u.x*24*zs(),u.y*24*zs()+5*zs())};
-  s+=P.map((p,i)=>`<g data-i="${i}" style="cursor:grab"><circle cx="${p.x}" cy="${p.y}" r="${22*zs()}" fill="transparent"/><circle cx="${p.x}" cy="${p.y}" r="${8*zs()}" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></g>`).join('');
+  s+=P.map((p,i)=>`<g data-i="${i}" style="cursor:grab"><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?30:22)*zs()}" fill="transparent"/><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?9:8)*zs()}" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></g>`).join('');
   s+=lab(A,'A')+lab(B,'B')+lab(C,'C');
-  $('#g').innerHTML=s;$('#facts').innerHTML=h;
+  $('#g').innerHTML=s;$('#facts').innerHTML=subH(h);
   if(anim){const fc=$('#facts');fc.classList.remove('fi');void fc.offsetWidth;fc.classList.add('fi')}
   anim=false;
 }
+const INFO={
+bis:{inc:'Üçgenin üç kenarına da içeriden değen çember. Merkezi, açıortayların kesiştiği I noktasıdır; yarıçapı r = Alan / s ile bulunur.',
+thm:'A köşesinden inen açıortay BC’yi D noktasında kesince |BD| / |DC| = c / b olur: açıortay karşı kenarı, komşu kenarların oranında böler.',
+arc:'Her köşedeki açıortayın ayırdığı iki açı eşittir; yaylar bunu gösterir.',
+pg:'Açıortay üzerinde gezdirebildiğin bir nokta (P). Özel bir nokta değil; açıortayın şu özelliğini görmek için: üzerindeki her nokta açının iki koluna eşit uzaktır. K ve L, P’den AB ve AC’ye inen dikmelerin ayaklarıdır; |PK| = |PL| her konumda geçerlidir.',
+ex:'A köşesinden geçen ve iç açıortaya dik olan doğru. BC doğrusunu E noktasında keser ve |AB| / |AC| = |EB| / |EC| olur. AB = AC ise BC’ye paraleldir, kesişmez.',
+exc:'Bir kenara ve diğer iki kenarın uzantılarına değen çember. Her üçgenin üç tane dış teğet çemberi vardır; merkezleri I_a, I_b, I_c.'},
+med:{ratio:'Ağırlık merkezi G, her kenarortayı köşeden itibaren 2 : 1 oranında böler (2k ve k).',
+area:'Üç kenarortay üçgeni, alanları birbirine eşit altı küçük üçgene ayırır.',
+mid:'Kenar orta noktalarını birleştirince orta üçgen oluşur. Kenarları ABC’nin karşılıklı kenarlarının yarısı kadar ve onlara paraleldir; alanı ABC’nin dörtte biridir.'},
+per:{circ:'Üç köşeden geçen çember. Merkezi O (orta dikmelerin kesişimi), yarıçapı R.',
+eq:'O’dan köşelere çizilen kesikli doğru parçaları eşittir: |OA| = |OB| = |OC| = R.',
+pt:'Orta dikme üzerinde gezdirebildiğin P noktası. Orta dikmenin özelliği: üzerindeki her nokta BC’nin iki ucuna eşit uzaktır, yani |PB| = |PC|.'},
+alt:{ext:'Yüksekliğin kenarla (ya da uzantısıyla) kesiştiği D, E, F noktaları yükseklik ayaklarıdır. Küçük kare dik açıyı gösterir.',
+orth:'Yükseklik ayaklarını birleştirince oluşan DEF üçgeni (ortodik üçgen).'},
+sl:{bis:'Bu kaydırıcı P noktasını açıortay üzerinde A köşesinden D’ye doğru (ve biraz ötesine) hareket ettirir. P ağırlık merkezi ya da başka özel bir nokta değil, sadece örnek bir noktadır. Nereye koyarsan koy |PK| = |PL| ve |AK| = |AL| kalır.',
+per:'Bu kaydırıcı P noktasını BC kenarının orta dikmesi üzerinde yukarı aşağı kaydırır. Her konumda |PB| = |PC| kalır.'}};
+const ib=k=>`<button class="ib" data-i="${k}" aria-label="Bu ne anlama geliyor?" aria-expanded="false">i</button>`;
+const slider=(id,l,mn,mx,v,info)=>`<div class="sl"><div class="slh"><span>${l}</span>${ib(id)}</div><p class="itx" id="i-${id}" hidden>${info}</p><input type="range" id="${id}" min="${mn}" max="${mx}" value="${v}" aria-label="${l}"></div>`;
 function ctrls(){
   $('#desc').textContent=DEF[mode];
-  $('#ctrls').innerHTML=TG[mode].map(([k,l])=>`<label class="tg">${l}<input type="checkbox" data-k="${k}" ${on[mode][k]?'checked':''}></label>`).join('')+
-    (mode==='per'?`<div class="sl">P noktasını kaydır<input type="range" id="sl" min="-170" max="170" value="${tt}"></div>`:'')+(mode==='bis'?`<div class="sl">G noktasını kaydır<input type="range" id="gs" min="10" max="130" value="${gt}"></div>`:'');
+  $('#ctrls').innerHTML=subH(TG[mode].map(([k,l])=>`<div class="tgw"><div class="tg"><label for="tg-${k}">${l}</label>${ib(k)}<input id="tg-${k}" type="checkbox" data-k="${k}" ${on[mode][k]?'checked':''}></div><p class="itx" id="i-${k}" hidden>${INFO[mode][k]}</p></div>`).join('')+
+    (mode==='per'?slider('sl','P noktasını kaydır',-170,170,tt,INFO.sl.per):'')+(mode==='bis'?slider('gs','P noktasını kaydır',10,130,gt,INFO.sl.bis):''));
 }
+$('#ctrls').addEventListener('click',e=>{const b=e.target.closest('.ib');if(!b)return;const q=$('#i-'+b.dataset.i);q.hidden=!q.hidden;b.setAttribute('aria-expanded',String(!q.hidden));b.classList.toggle('on',!q.hidden)});
 $('#ctrls').addEventListener('input',e=>{const t=e.target;if(t.dataset.k){on[mode][t.dataset.k]=t.checked?1:0}else if(t.id==='sl')tt=+t.value;else if(t.id==='gs')gt=+t.value;anim=!!t.dataset.k;draw()});
-$('#tabs').addEventListener('click',e=>{const m=e.target.dataset.m;if(!m)return;mode=m;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));ctrls();anim=true;draw()});
-$('#presets').addEventListener('click',e=>{const p=e.target.dataset.p;if(!p)return;tween(PR[p])});
+$('#tabs').addEventListener('click',e=>{const m=e.target.dataset.m;if(!m)return;if(pf)closePf(1);mode=m;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));ctrls();anim=true;draw()});
+$('#presets').addEventListener('click',e=>{const p=e.target.dataset.p;if(!p)return;tween(curPR()[p])});
 let drag=-1;const sv=$('#sv');
 const pt=e=>{const r=sv.getBoundingClientRect();return{x:vb.x+(e.clientX-r.left)*vb.w/r.width,y:vb.y+(e.clientY-r.top)*vb.h/r.height}};
-sv.addEventListener('pointerdown',e=>{const t=e.target.closest('[data-i]');cancelAnimationFrame(vbRaf);vbT=null;if(t){drag=+t.dataset.i;stopPlay()}else pan={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};try{sv.setPointerCapture(e.pointerId)}catch(_){}});
-sv.addEventListener('pointermove',e=>{if(pan){const r=sv.getBoundingClientRect();vb.x=pan.vx-(e.clientX-pan.x)*vb.w/r.width;vb.y=pan.vy-(e.clientY-pan.y)*vb.h/r.height;sv.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);return}if(drag<0)return;const p=pt(e),q=P.map(v=>({...v}));q[drag]={x:Math.min(vb.x+vb.w-24,Math.max(vb.x+24,p.x)),y:Math.min(vb.y+vb.h-24,Math.max(vb.y+24,p.y))};if(area(q[0],q[1],q[2])>2500){P=q;draw()}});
-sv.addEventListener('pointerup',()=>{drag=-1;pan=null});
-sv.addEventListener('pointercancel',()=>{drag=-1;pan=null});
+const tp=new Map();let pz=null;
+function pinchStart(){const [a,b]=[...tp.values()],r=sv.getBoundingClientRect();
+  pz={d:Math.hypot(a.x-b.x,a.y-b.y)||1,vb:{...vb},r};const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2;
+  pz.wx=vb.x+(cx-r.left)*vb.w/r.width;pz.wy=vb.y+(cy-r.top)*vb.h/r.height}
+function pinchMove(){if(!pz)return;const [a,b]=[...tp.values()],d2=Math.hypot(a.x-b.x,a.y-b.y)||1,cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,r=pz.r;
+  const nw=Math.min(3200,Math.max(160,pz.vb.w*pz.d/d2)),nh=nw*H/W;
+  vb={x:pz.wx-(cx-r.left)*nw/r.width,y:pz.wy-(cy-r.top)*nh/r.height,w:nw,h:nh};setVB()}
+sv.addEventListener('touchstart',e=>{if(e.touches.length>1||e.target.closest('[data-i]'))e.preventDefault()},{passive:false});
+sv.addEventListener('pointerdown',e=>{cancelAnimationFrame(vbRaf);vbT=null;
+  if(e.pointerType==='touch'){tp.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(tp.size===2){drag=-1;pan=null;pinchStart();return}
+    const t=e.target.closest('[data-i]');if(t){drag=+t.dataset.i;stopPlay();try{sv.setPointerCapture(e.pointerId)}catch(_){}}
+    return}
+  const t=e.target.closest('[data-i]');if(t){drag=+t.dataset.i;stopPlay()}else pan={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y};try{sv.setPointerCapture(e.pointerId)}catch(_){}});
+sv.addEventListener('pointermove',e=>{
+  if(tp.has(e.pointerId)){tp.set(e.pointerId,{x:e.clientX,y:e.clientY});if(tp.size>=2){pinchMove();return}}
+  if(pan){const r=sv.getBoundingClientRect();vb.x=pan.vx-(e.clientX-pan.x)*vb.w/r.width;vb.y=pan.vy-(e.clientY-pan.y)*vb.h/r.height;sv.setAttribute('viewBox',`${vb.x} ${vb.y} ${vb.w} ${vb.h}`);return}
+  if(drag<0)return;const p=pt(e),q=P.map(v=>({...v}));q[drag]={x:Math.min(vb.x+vb.w-24,Math.max(vb.x+24,p.x)),y:Math.min(vb.y+vb.h-24,Math.max(vb.y+24,p.y))};if(area(q[0],q[1],q[2])>2500){P=q;draw()}});
+const endPtr=e=>{tp.delete(e.pointerId);if(tp.size<2)pz=null;if(!tp.size||e.pointerType!=='touch'){drag=-1;pan=null}};
+sv.addEventListener('pointerup',endPtr);
+sv.addEventListener('pointercancel',endPtr);
 let raf=0;
 function stopPlay(){playing=0;$('#play').textContent='▶ Hareket'}
 function tween(T){stopPlay();cancelAnimationFrame(raf);const S=P.map(v=>({...v})),t0=performance.now();
@@ -271,9 +465,28 @@ $('#zfit').onclick=()=>{const xs=FIT.map(p=>p.x),ys=FIT.map(p=>p.y),x0=Math.min(
 sv.addEventListener('wheel',e=>{e.preventDefault();zoomAt(pt(e),e.deltaY>0?1.15:1/1.15,220)},{passive:false});
 const RT=document.documentElement,mq=matchMedia('(prefers-color-scheme: dark)');
 const dk=()=>RT.dataset.theme?RT.dataset.theme==='dark':mq.matches;
-const th=()=>$('#theme').textContent=dk()?'☀︎ Açık mod':'☾ Koyu mod';
+const th=()=>{const d=dk();$('#theme').innerHTML=`<span aria-hidden="true">${d?'☀︎':'☾'}</span><span class="tl">&nbsp;${d?'Açık mod':'Koyu mod'}</span>`;$('#theme').setAttribute('aria-label',d?'Açık moda geç':'Koyu moda geç')};
 $('#theme').onclick=()=>{RT.dataset.theme=dk()?'light':'dark';th()};
 mq.addEventListener&&mq.addEventListener('change',()=>{if(!RT.dataset.theme)th()});
+function openPf(id){stopPlay();cancelAnimationFrame(raf);clearInterval(pfTimer);pfTimer=0;pf={id,st:0};$('#ctrls').style.display='none';document.body.classList.add('pfon');anim=true;draw();if(id==='alt1')$('#zfit').click();if(mqN.matches)setTimeout(()=>sv.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+function closePf(silent){clearInterval(pfTimer);pfTimer=0;const id=pf&&pf.id;pf=null;$('#ctrls').style.display='';document.body.classList.remove('pfon');if(id==='alt1')$('#zrst').click();if(!silent){anim=true;draw()}}
+function goStep(n){const N=PF[pf.id].steps.length;pf.st=Math.max(0,Math.min(N-1,n));anim=true;draw()}
+function pfStop(){clearInterval(pfTimer);pfTimer=0}
+function pfAuto(){
+  if(pfTimer){pfStop();draw();return}
+  const N=PF[pf.id].steps.length;if(pf.st>=N-1)pf.st=0;
+  pfTimer=setInterval(()=>{if(!pf||pf.st>=N-1){pfStop();draw();return}goStep(pf.st+1)},3400);
+  goStep(pf.st)}
+$('#facts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.pf){openPf(b.dataset.pf);return}
+  const a=b.dataset.a;if(!pf||!a)return;
+  if(a==='next'){pfStop();goStep(pf.st+1)}
+  else if(a==='prev'){pfStop();goStep(pf.st-1)}
+  else if(a==='auto')pfAuto();
+  else if(a==='close')closePf()});
+addEventListener('keydown',e=>{if(!pf)return;if(e.key==='ArrowRight'){pfStop();goStep(pf.st+1)}else if(e.key==='ArrowLeft'){pfStop();goStep(pf.st-1)}else if(e.key==='Escape')closePf()});
+sv.setAttribute('viewBox',`0 0 ${W} ${H}`);
+mqN.addEventListener&&mqN.addEventListener('change',()=>{stopPlay();cancelAnimationFrame(raf);W=mqN.matches?400:640;H=mqN.matches?440:460;vb={x:0,y:0,w:W,h:H};sv.setAttribute('viewBox',`0 0 ${W} ${H}`);P=curPR().dar.map(([x,y])=>({x,y}));anim=true;draw();if(pf&&pf.id==='alt1')$('#zfit').click()});
 th();ctrls();draw();
 </script>
 </body>
