@@ -315,6 +315,7 @@ const whyCard=m=>card('Neden böyle?',Object.entries(PF).filter(([k,v])=>v.mode=
 const pfPanel=(D0,st,x)=>{const n=D0.steps.length,run=pfTimer&&pf.st<n-1;
   return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs">${D0.steps.map((_,i)=>`<i class="${i<=pf.st?'on':''}"></i>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
 
+let lastF=0,playId=0,HOME=null,LP=null,skipClick=0;
 function draw(){
   const [A,B,C]=P,a=d(B,C),b=d(A,C),c=d(A,B),K=area(A,B,C),Ku=K/(U*U),au=a/U,bu=b/U,cu=c/U;
   const gA=ang(a,b,c),gB=ang(b,a,c),gC=ang(c,a,b),mx=Math.max(gA,gB,gC);
@@ -415,6 +416,7 @@ function draw(){
   s+=P.map((p,i)=>`<g data-i="${i}" style="cursor:grab"><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?30:22)*zs()}" fill="transparent"/><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?9:8)*zs()}" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></g>`).join('');
   s+=lab(A,'A')+lab(B,'B')+lab(C,'C');
   $('#g').innerHTML=s;
+  /* hareket sırasında bilgi kartını seyrek güncelle (telefonda donmayı önler) */
   if(!(playing&&!pf&&performance.now()-lastF<140)){$('#facts').innerHTML=subH(h);lastF=performance.now()}
   if(anim){const fc=$('#facts');fc.classList.remove('fi');void fc.offsetWidth;fc.classList.add('fi')}
   anim=false;
@@ -471,25 +473,31 @@ const endPtr=e=>{tp.delete(e.pointerId);if(tp.size<2)pz=null;if(!tp.size||e.poin
 sv.addEventListener('pointerup',endPtr);
 sv.addEventListener('pointercancel',endPtr);
 let raf=0;
-let lastF=0;
-function stopPlay(){const was=playing;playing=0;$('#play').textContent='▶ Hareket';if(was){cancelAnimationFrame(raf);draw()}}
+/* ===== Hareket: durdurma ve başlatma (merkez konumu sabit, kayma birikmez) ===== */
+function stopPlay(){const was=playing;playing=0;playId++;$('#play').textContent='▶ Hareket';if(was){cancelAnimationFrame(raf);draw()}}
 function tween(T){stopPlay();cancelAnimationFrame(raf);const S=P.map(v=>({...v})),t0=performance.now();
   const step=now=>{let k=Math.min(1,(now-t0)/800);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
     const q=S.map((v,i)=>({x:v.x+(T[i][0]-v.x)*k,y:v.y+(T[i][1]-v.y)*k}));
     if(area(q[0],q[1],q[2])>300){P=q;draw()}
     if(k<1)raf=requestAnimationFrame(step)};
   raf=requestAnimationFrame(step)}
-  let skipClick=0;
-  $('#play').addEventListener('pointerdown',()=>{if(playing){stopPlay();skipClick=1;setTimeout(()=>skipClick=0,400)}});
-  $('#play').onclick=()=>{
-    if(skipClick){skipClick=0;return}
-    if(playing){stopPlay();return}
-  cancelAnimationFrame(raf);playing=1;$('#play').textContent='❚❚ Durdur';
-  const B0=P.map(v=>({...v})),t0=performance.now();
-  const loop=now=>{if(!playing)return;const t=(now-t0)/1000;
-    const q=B0.map((v,i)=>({x:Math.min(W-24,Math.max(24,v.x+50*Math.sin(t*.9+i*2.1))),y:Math.min(H-24,Math.max(24,v.y+35*Math.cos(t*.7+i*1.7)))}));
-    if(area(q[0],q[1],q[2])>2500)P=q;
-    tt=110*Math.sin(t*1.2);gt=70+55*Math.sin(t*1.1);
+$('#play').addEventListener('pointerdown',()=>{if(playing){stopPlay();skipClick=1;setTimeout(()=>skipClick=0,400)}});
+$('#play').onclick=()=>{
+  if(skipClick){skipClick=0;return}
+  if(playing){stopPlay();return}
+  cancelAnimationFrame(raf);
+  if(!HOME||P!==LP)HOME=P.map(v=>({...v}));
+  const S=P.map(v=>({...v})),tt0=tt,gt0=gt,id=++playId,t0=performance.now();
+  playing=1;$('#play').textContent='❚❚ Durdur';
+  const loop=now=>{
+    if(!playing||id!==playId)return;
+    const t=(now-t0)/1000,k=Math.min(1,t/.7),r=k*k*(3-2*k);
+    const q=HOME.map((v,i)=>{
+      const x=Math.min(W-24,Math.max(24,v.x+50*Math.sin(t*.9+i*2.1)));
+      const y=Math.min(H-24,Math.max(24,v.y+35*Math.cos(t*.7+i*1.7)));
+      return{x:S[i].x+(x-S[i].x)*r,y:S[i].y+(y-S[i].y)*r}});
+    if(area(q[0],q[1],q[2])>2500){P=q;LP=q}
+    tt=tt0+(110*Math.sin(t*1.2)-tt0)*r;gt=gt0+(70+55*Math.sin(t*1.1)-gt0)*r;
     const sl=$('#sl');if(sl)sl.value=tt;const gs=$('#gs');if(gs)gs.value=gt;
     draw();raf=requestAnimationFrame(loop)};
   raf=requestAnimationFrame(loop)};
