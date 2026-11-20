@@ -414,7 +414,8 @@ function draw(){
   const lab=(V,s2)=>{const u=unit(G,V);return tx(V,s2,'var(--ink)',u.x*24*zs(),u.y*24*zs()+5*zs())};
   s+=P.map((p,i)=>`<g data-i="${i}" style="cursor:grab"><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?30:22)*zs()}" fill="transparent"/><circle cx="${p.x}" cy="${p.y}" r="${(mqN.matches?9:8)*zs()}" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/></g>`).join('');
   s+=lab(A,'A')+lab(B,'B')+lab(C,'C');
-  $('#g').innerHTML=s;$('#facts').innerHTML=subH(h);
+  $('#g').innerHTML=s;
+  if(!(playing&&!pf&&performance.now()-lastF<140)){$('#facts').innerHTML=subH(h);lastF=performance.now()}
   if(anim){const fc=$('#facts');fc.classList.remove('fi');void fc.offsetWidth;fc.classList.add('fi')}
   anim=false;
 }
@@ -470,15 +471,19 @@ const endPtr=e=>{tp.delete(e.pointerId);if(tp.size<2)pz=null;if(!tp.size||e.poin
 sv.addEventListener('pointerup',endPtr);
 sv.addEventListener('pointercancel',endPtr);
 let raf=0;
-function stopPlay(){playing=0;$('#play').textContent='▶ Hareket'}
+let lastF=0;
+function stopPlay(){const was=playing;playing=0;$('#play').textContent='▶ Hareket';if(was){cancelAnimationFrame(raf);draw()}}
 function tween(T){stopPlay();cancelAnimationFrame(raf);const S=P.map(v=>({...v})),t0=performance.now();
   const step=now=>{let k=Math.min(1,(now-t0)/800);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
     const q=S.map((v,i)=>({x:v.x+(T[i][0]-v.x)*k,y:v.y+(T[i][1]-v.y)*k}));
     if(area(q[0],q[1],q[2])>300){P=q;draw()}
     if(k<1)raf=requestAnimationFrame(step)};
   raf=requestAnimationFrame(step)}
-$('#play').onclick=()=>{
-  if(playing){stopPlay();return}
+  let skipClick=0;
+  $('#play').addEventListener('pointerdown',()=>{if(playing){stopPlay();skipClick=1;setTimeout(()=>skipClick=0,400)}});
+  $('#play').onclick=()=>{
+    if(skipClick){skipClick=0;return}
+    if(playing){stopPlay();return}
   cancelAnimationFrame(raf);playing=1;$('#play').textContent='❚❚ Durdur';
   const B0=P.map(v=>({...v})),t0=performance.now();
   const loop=now=>{if(!playing)return;const t=(now-t0)/1000;
