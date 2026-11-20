@@ -1,4 +1,4 @@
-/* Üçgenin Yardımcı Elemanları – tanıtım turu (v2: masaüstü + ayrı mobil düzen)
+/* Üçgenin Yardımcı Elemanları – tanıtım turu (v3: akıcı geçişler, ayrı mobil düzen)
    Kullanım: ana <script> bloğundan SONRA, </body> öncesine ekle:
    <script src="tour.js"></script>
 */
@@ -8,6 +8,7 @@ var KEY='ucgen-tur-v1';
 var $=function(s){return document.querySelector(s)};
 var mob=matchMedia('(max-width:600px)');
 var coarse=matchMedia('(pointer:coarse)');
+var RM=matchMedia('(prefers-reduced-motion:reduce)');
 
 /* ---------- Adımlar (xm: sadece mobilde gösterilen metin) ---------- */
 var STEPS=[
@@ -37,34 +38,37 @@ var STEPS=[
 ];
 
 /* ---------- Stil ---------- */
+var EZ='cubic-bezier(.4,0,.2,1)';
 var css=
 /* ortak */
-'.tour{position:fixed;inset:0;z-index:1000;display:none;-webkit-tap-highlight-color:transparent}'+
+'.tour{position:fixed;inset:0;z-index:1000;display:none;opacity:0;transition:opacity .35s ease;-webkit-tap-highlight-color:transparent}'+
 '.tour.on{display:block}'+
-'.tour .tp{position:fixed;background:rgba(0,0,0,.34);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}'+
-'.tour .tr{position:fixed;border-radius:14px;box-shadow:0 0 0 2px var(--blue),0 0 26px color-mix(in srgb,var(--blue) 50%,transparent);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease;pointer-events:none}'+
-'.tour.ns .tp,.tour.ns .tr{transition:none}'+
-'.tour .tt{position:fixed;width:340px;max-width:calc(100vw - 24px);background:var(--card);color:var(--ink);border-radius:20px;padding:18px 18px 14px;box-shadow:0 14px 44px rgba(0,0,0,.38);transition:left .3s ease,top .3s ease}'+
+'.tour.vis{opacity:1}'+
+'.tour .tp{position:fixed;background:rgba(0,0,0,.34);-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)}'+
+'.tour .tr{position:fixed;border-radius:14px;box-shadow:0 0 0 2px var(--blue),0 0 26px color-mix(in srgb,var(--blue) 50%,transparent);transition:opacity .25s ease;pointer-events:none}'+
+'.tour .tt{position:fixed;width:360px;max-width:calc(100vw - 24px);background:var(--card);color:var(--ink);border-radius:20px;padding:18px 18px 14px;box-shadow:0 14px 44px rgba(0,0,0,.38);transition:left .55s '+EZ+',top .55s '+EZ+',height .38s '+EZ+',opacity .2s ease}'+
+'.tour .tt.sw{opacity:0}'+
+'.tour .tc{transition:opacity .18s ease,transform .18s ease}'+
+'.tour .tc.sw{opacity:0;transform:translateY(8px)}'+
 '.tour .td{display:flex;gap:5px;margin-bottom:12px}'+
-'.tour .td i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .2s,width .2s}'+
+'.tour .td i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .3s,width .3s}'+
 '.tour .td i.on{background:var(--blue);width:20px;border-radius:4px}'+
 '.tour h2{margin:0 0 6px;font-size:19px;letter-spacing:-.01em;font-weight:700}'+
 '.tour p{margin:0 0 16px;font-size:14.5px;line-height:1.55;color:var(--mute)}'+
 '.tour .tb{display:flex;align-items:center;gap:8px}'+
 '.tour .tb .sp{flex:1}'+
-'.tour .tb button{font:inherit;font-size:14px;border-radius:980px;padding:9px 16px;min-height:40px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);touch-action:manipulation}'+
+'.tour .tb button{font:inherit;font-size:14px;border-radius:980px;padding:9px 16px;min-height:40px;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);touch-action:manipulation;transition:transform .12s ease,opacity .12s ease}'+
+'.tour .tb button:active{transform:scale(.96)}'+
 '.tour .tb button.nx{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}'+
 '.tour .tb button.sk{border:0;background:none;color:var(--mute);padding-left:4px;padding-right:4px}'+
 '.tour .tb button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}'+
 '.tour .grab,.tour .cnt{display:none}'+
-/* ortada karşılama kartı (masaüstü) */
-'.tour .tt.ctr{left:50%;top:50%;transform:translate(-50%,-50%);width:380px;text-align:center;transition:none}'+
+/* karşılama kartı (masaüstü): sadece yazı düzeni değişir, konum satır içi hesaplanır */
+'.tour .tt.ctr{text-align:center}'+
 '.tour .tt.ctr h2{font-size:24px}'+
 '.tour .tt.ctr .td{justify-content:center}'+
-'.tour .tt.ctr .tb{justify-content:center;flex-direction:row-reverse}'+
-'.tour .tt.ctr .tb .sp{display:none}'+
 /* ===== MOBİL: alttan açılan panel ===== */
-'.tour .tt.sheet{left:8px;right:8px;width:auto;max-width:none;top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:24px;padding:24px 16px 14px;max-height:50vh;max-height:50dvh;overflow-y:auto;overscroll-behavior:contain;transition:none;box-shadow:0 -6px 40px rgba(0,0,0,.42);text-align:left}'+
+'.tour .tt.sheet{left:8px;right:8px;width:auto;max-width:none;top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));border-radius:24px;padding:24px 16px 14px;max-height:50vh;max-height:50dvh;overflow-y:auto;overscroll-behavior:contain;transition:height .38s '+EZ+',opacity .2s ease;box-shadow:0 -6px 40px rgba(0,0,0,.42);text-align:left}'+
 '.tour .tt.sheet .grab{display:block;position:absolute;top:8px;left:50%;width:40px;height:4px;margin-left:-20px;border-radius:2px;background:var(--line)}'+
 '.tour .tt.sheet .td{gap:4px;margin:0 0 10px}'+
 '.tour .tt.sheet .td i,.tour .tt.sheet .td i.on{flex:1;width:auto;height:4px;border-radius:2px}'+
@@ -77,7 +81,7 @@ var css=
 '.tour .tt.sheet .tb button.pv{flex:0 0 34%}'+
 '.tour .tt.sheet .tb button.sk{position:absolute;top:14px;right:8px;flex:none;min-height:44px;padding:0 14px;font-size:14px}'+
 /* mobil + ortada (karşılama) */
-'.tour .tt.ctr.sheet{left:50%;right:auto;top:50%;bottom:auto;width:calc(100vw - 28px);max-height:calc(100vh - 28px);padding:26px 18px 16px;text-align:center}'+
+'.tour .tt.ctr.sheet{left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%);width:calc(100vw - 28px);max-height:calc(100vh - 28px);padding:26px 18px 16px;text-align:center}'+
 '.tour .tt.ctr.sheet .grab,.tour .tt.ctr.sheet .td,.tour .tt.ctr.sheet .cnt{display:none}'+
 '.tour .tt.ctr.sheet h2{font-size:26px;padding-right:0}'+
 '.tour .tt.ctr.sheet .tb{flex-direction:column}'+
@@ -86,20 +90,21 @@ var css=
 /* başlık ile üst butonlar çakışmasın */
 '@media(min-width:601px){h1{padding-right:400px!important}}'+
 '@media(max-width:600px){h1{padding-right:104px!important}}'+
-'@media(prefers-reduced-motion:reduce){.tour *{transition:none!important}}';
+'@media(prefers-reduced-motion:reduce){.tour,.tour *{transition:none!important}}';
 var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
 /* ---------- DOM ---------- */
 var root=document.createElement('div');
 root.className='tour';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','tourT');
 root.innerHTML='<div class="tp"></div><div class="tp"></div><div class="tp"></div><div class="tp"></div><div class="tr"></div>'+
- '<div class="tt"><div class="grab"></div><div class="td"></div><div class="cnt" id="tourC"></div><h2 id="tourT"></h2><p id="tourX"></p>'+
+ '<div class="tt"><div class="grab"></div>'+
+ '<div class="tc"><div class="td"></div><div class="cnt" id="tourC"></div><h2 id="tourT"></h2><p id="tourX"></p></div>'+
  '<div class="tb"><button type="button" class="sk" data-a="skip">Atla</button><span class="sp"></span>'+
  '<button type="button" class="pv" data-a="prev">Geri</button><button type="button" class="nx" data-a="next"></button></div></div>';
 document.body.appendChild(root);
 
 var tps=[].slice.call(root.querySelectorAll('.tp')),ring=root.querySelector('.tr'),tip=root.querySelector('.tt'),
-    dots=root.querySelector('.td'),tT=$('#tourT'),tX=$('#tourX'),tC=$('#tourC'),
+    tc=root.querySelector('.tc'),dots=root.querySelector('.td'),tT=$('#tourT'),tX=$('#tourX'),cnt=$('#tourC'),
     bPrev=root.querySelector('.pv'),bNext=root.querySelector('.nx'),bSkip=root.querySelector('.sk');
 
 var btn=document.createElement('button');
@@ -108,76 +113,131 @@ btn.innerHTML='<span aria-hidden="true">?</span><span class="tl">&nbsp;Tur</span
 var acts=$('.acts'),themeBtn=$('#theme');
 if(acts)acts.insertBefore(btn,themeBtn||null);
 
-/* ---------- Mantık ---------- */
-var i=-1,nsT=0;
-function setBox(e,l,t,w,h){e.style.left=Math.round(l)+'px';e.style.top=Math.round(t)+'px';e.style.width=Math.max(0,Math.round(w))+'px';e.style.height=Math.max(0,Math.round(h))+'px'}
+/* ---------- Yardımcılar ---------- */
+var i=-1,anim=0,raf=0,cur=null,swT=0,mT=0,endT=0;
+var ease=function(k){return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2};
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-
-function place(){
-  if(i<0)return;
-  var s=STEPS[i],vw=innerWidth,vh=innerHeight,el=s.s&&$(s.s),r=null;
-  if(el){
-    var b=el.getBoundingClientRect(),p=mob.matches?6:8,
-        l=Math.max(0,b.left-p),t=Math.max(0,b.top-p),rr=Math.min(vw,b.right+p),bb=Math.min(vh,b.bottom+p);
-    r={left:l,top:t,right:rr,bottom:bb,width:Math.max(0,rr-l),height:Math.max(0,bb-t)};
+function setBox(e,l,t,w,h){e.style.left=Math.round(l)+'px';e.style.top=Math.round(t)+'px';e.style.width=Math.max(0,Math.round(w))+'px';e.style.height=Math.max(0,Math.round(h))+'px'}
+function centerBox(){var x=innerWidth/2,y=innerHeight/2;return{l:x,t:y,r:x,b:y,none:1}}
+/* hedef elemanın (dy kadar kaydırılmış) dolgulu, ekrana sığdırılmış kutusu */
+function rectOf(el,dy){
+  var b=el.getBoundingClientRect(),p=mob.matches?6:8,vw=innerWidth,vh=innerHeight;
+  var l=Math.max(0,b.left-p),t=Math.max(0,b.top-p-dy),r=Math.min(vw,b.right+p),bt=Math.min(vh,b.bottom+p-dy);
+  return{l:l,t:t,r:Math.max(l,r),b:Math.max(t,bt)};
+}
+function paint(q){
+  var vw=innerWidth,vh=innerHeight;
+  if(q.full){
+    setBox(tps[0],0,0,vw,vh);setBox(tps[1],0,0,0,0);setBox(tps[2],0,0,0,0);setBox(tps[3],0,0,0,0);
+    ring.style.opacity=0;return;
   }
-  if(r){
-    setBox(tps[0],0,0,vw,r.top);
-    setBox(tps[1],0,r.bottom,vw,vh-r.bottom);
-    setBox(tps[2],0,r.top,r.left,r.height);
-    setBox(tps[3],r.right,r.top,vw-r.right,r.height);
-    setBox(ring,r.left,r.top,r.width,r.height);
-    ring.style.display='block';
-  }else{
-    setBox(tps[0],0,0,vw,vh);
-    setBox(tps[1],0,0,0,0);setBox(tps[2],0,0,0,0);setBox(tps[3],0,0,0,0);
-    ring.style.display='none';
-  }
-  if(mob.matches)return; /* mobilde panel CSS ile sabit */
-  tip.className='tt';tip.style.left='';tip.style.top='';
-  if(!r){tip.classList.add('ctr');return}
-  var tw=tip.offsetWidth,th=tip.offsetHeight,g=14,L,T;
-  if(r.bottom+g+th<=vh-12){T=r.bottom+g;L=r.left+r.width/2-tw/2}
-  else if(r.top-g-th>=12){T=r.top-g-th;L=r.left+r.width/2-tw/2}
-  else if(r.right+g+tw<=vw-12){L=r.right+g;T=r.top}
-  else if(r.left-g-tw>=12){L=r.left-g-tw;T=r.top}
-  else{L=r.left+r.width/2-tw/2;T=vh-th-16}
-  tip.style.left=clamp(L,12,vw-tw-12)+'px';
-  tip.style.top=clamp(T,12,vh-th-12)+'px';
+  setBox(tps[0],0,0,vw,q.t);
+  setBox(tps[1],0,q.b,vw,vh-q.b);
+  setBox(tps[2],0,q.t,q.l,q.b-q.t);
+  setBox(tps[3],q.r,q.t,vw-q.r,q.b-q.t);
+  setBox(ring,q.l,q.t,q.r-q.l,q.b-q.t);
+  ring.style.opacity=q.none?0:1;
+}
+function tipPos(E,th,tw){
+  var vw=innerWidth,vh=innerHeight,g=14,L,T;
+  if(E.none)return{L:(vw-tw)/2,T:(vh-th)/2};
+  var cx=(E.l+E.r)/2;
+  if(E.b+g+th<=vh-12){T=E.b+g;L=cx-tw/2}
+  else if(E.t-g-th>=12){T=E.t-g-th;L=cx-tw/2}
+  else if(E.r+g+tw<=vw-12){L=E.r+g;T=E.t}
+  else if(E.l-g-tw>=12){L=E.l-g-tw;T=E.t}
+  else{L=cx-tw/2;T=vh-th-16}
+  return{L:clamp(L,12,vw-tw-12),T:clamp(T,12,vh-th-12)};
 }
 
-function show(n){
+/* anlık yerleştirme (yeniden boyutlandırma, kullanıcı kaydırması) */
+function place(){
+  if(i<0||anim)return;
+  var s=STEPS[i],el=s.s&&$(s.s),E=el?rectOf(el,0):centerBox();
+  paint(E.none?{full:1}:E);cur=E;
+  if(!mob.matches){
+    var p=tipPos(E,tip.offsetHeight,tip.offsetWidth);
+    tip.style.left=p.L+'px';tip.style.top=p.T+'px';
+  }
+}
+
+/* sayfa kaydırması + vurgu kutusunu birlikte, aynı eğriyle akıt */
+function run(S,el,y0,y1,dur){
+  cancelAnimationFrame(raf);anim=1;
+  var t0=performance.now();
+  function f(now){
+    var k=Math.min(1,(now-t0)/dur),e=ease(k);
+    scrollTo(0,y0+(y1-y0)*e);
+    var E=el?rectOf(el,0):centerBox();
+    paint({l:S.l+(E.l-S.l)*e,t:S.t+(E.t-S.t)*e,r:S.r+(E.r-S.r)*e,b:S.b+(E.b-S.b)*e,none:E.none});
+    if(k<1)raf=requestAnimationFrame(f);
+    else{anim=0;cur=E;if(E.none)paint({full:1})}
+  }
+  raf=requestAnimationFrame(f);
+}
+function settle(){if(!anim)return;cancelAnimationFrame(raf);anim=0;place()}
+
+/* ---------- Adım gösterimi ---------- */
+function show(n,first){
+  clearTimeout(swT);cancelAnimationFrame(raf);anim=0;
   i=clamp(n,0,STEPS.length-1);
-  var s=STEPS[i],last=STEPS.length-1,m=mob.matches,el=s.s&&$(s.s);
+  var s=STEPS[i],m=mob.matches,el=s.s&&$(s.s),isCtr=!el,wasCtr=tip.classList.contains('ctr');
+  var whole=m&&!first&&isCtr!==wasCtr;
+  if(first||RM.matches){swap(s,el,isCtr,m,first,false);return}
+  (whole?tip:tc).classList.add('sw');
+  swT=setTimeout(function(){swap(s,el,isCtr,m,false,whole)},150);
+}
+
+function swap(s,el,isCtr,m,first,whole){
+  var last=STEPS.length-1,txt=m&&s.xm?s.xm:s.x;
   tT.textContent=s.t;
-  var txt=m&&s.xm?s.xm:s.x;
   tX.textContent=typeof txt==='function'?txt():txt;
-  tC.textContent='Adım '+(i+1)+' / '+STEPS.length;
+  cnt.textContent='Adım '+(i+1)+' / '+STEPS.length;
   dots.innerHTML=STEPS.map(function(_,k){return '<i class="'+(k<=i?'on':'')+'"></i>'}).join('');
   bPrev.style.display=i===0?'none':'';
   bSkip.style.display=i===last?'none':'';
   bNext.textContent=i===0?'Turu başlat':i===last?'Bitir':'İleri';
 
-  if(m){
-    /* panel sınıfını önce ver ki yüksekliği ölçebilelim */
-    tip.className='tt sheet'+(el?'':' ctr');tip.style.left='';tip.style.top='';
-    if(el){
-      var b=el.getBoundingClientRect(),sheetTop=tip.getBoundingClientRect().top,
-          avail=sheetTop-24, /* üstten 12 + panelden 12 boşluk */
-          want=b.height<=avail?12+(avail-b.height)/2:12;
-      scrollBy(0,b.top-want);
-    }else scrollTo(0,0);
-  }else if(el){
-    var bb=el.getBoundingClientRect(),tall=bb.height>innerHeight*.7;
-    el.scrollIntoView({block:tall?'start':'center'});
+  /* kart yüksekliği: eski → yeni yumuşak geçiş */
+  var h0=tip.offsetHeight;
+  tip.className='tt'+(m?' sheet':'')+(isCtr?' ctr':'');
+  tip.style.height='';tip.style.overflow='';
+  var h1=tip.offsetHeight,sheetTop=m?tip.getBoundingClientRect().top:0;
+  tc.classList.remove('sw');
+  clearTimeout(mT);
+  if(!first&&!whole&&!RM.matches&&Math.abs(h1-h0)>1){
+    tip.style.overflow='hidden';tip.style.height=h0+'px';void tip.offsetHeight;tip.style.height=h1+'px';
+    mT=setTimeout(function(){tip.style.height='';tip.style.overflow=''},420);
   }
-  place();
+
+  /* hedef kaydırma konumu */
+  var y0=window.pageYOffset,y1=0,vh=innerHeight;
+  if(el){
+    var b=el.getBoundingClientRect(),want;
+    if(m){var avail=sheetTop-24;want=b.height<=avail?12+(avail-b.height)/2:12}
+    else want=b.height>vh*.7?12:(vh-b.height)/2;
+    y1=clamp(y0+b.top-want,0,Math.max(0,document.documentElement.scrollHeight-vh));
+  }
+  var E1=el?rectOf(el,y1-y0):centerBox();
+
+  /* masaüstü: kartı hedefin yanına kaydır (CSS geçişi) */
+  if(!m){
+    var pp=tipPos(E1,h1,tip.offsetWidth);
+    if(first){tip.style.transition='none'}
+    tip.style.left=pp.L+'px';tip.style.top=pp.T+'px';
+    if(first){void tip.offsetHeight;tip.style.transition=''}
+  }else{tip.style.left='';tip.style.top=''}
+
+  if(first||RM.matches){
+    scrollTo(0,y1);
+    var E=el?rectOf(el,0):centerBox();
+    paint(E.none?{full:1}:E);cur=E;
+  }else run(cur||centerBox(),el,y0,y1,620);
   try{bNext.focus({preventScroll:true})}catch(e){}
 }
 
 function lockPage(on){
   if(mob.matches){
-    /* mobilde kaydırma serbest; alt panelin altında kalmasın diye boşluk ekle */
     document.body.style.overflow='';
     document.body.style.paddingBottom=on?Math.round(innerHeight*.55)+'px':'';
   }else{
@@ -187,23 +247,30 @@ function lockPage(on){
 }
 
 function start(){
+  if(i>=0)return;
   if(typeof PRES!=='undefined'&&PRES&&typeof exitPres==='function')exitPres();
   if(typeof stopPlay==='function')stopPlay();
-  lockPage(true);
-  root.classList.add('on');
-  show(0);
+  clearTimeout(endT);
+  lockPage(true);cur=null;
+  tip.classList.remove('sw');tc.classList.remove('sw');
+  root.classList.add('on');void root.offsetHeight;root.classList.add('vis');
+  show(0,true);
 }
 function end(){
-  i=-1;root.classList.remove('on');
-  document.body.style.overflow='';document.body.style.paddingBottom='';
+  clearTimeout(swT);cancelAnimationFrame(raf);anim=0;i=-1;
+  root.classList.remove('vis');
   try{localStorage.setItem(KEY,'1')}catch(e){}
-  scrollTo(0,0);
+  try{scrollTo({top:0,behavior:RM.matches?'auto':'smooth'})}catch(e){scrollTo(0,0)}
+  endT=setTimeout(function(){
+    root.classList.remove('on');
+    document.body.style.overflow='';document.body.style.paddingBottom='';
+  },RM.matches?0:360);
   try{btn.focus({preventScroll:true})}catch(e){}
 }
 function next(){i===STEPS.length-1?end():show(i+1)}
 
 root.addEventListener('click',function(e){
-  var b=e.target.closest('button');if(!b)return;
+  var b=e.target.closest('button');if(!b||i<0)return;
   var a=b.dataset.a;
   if(a==='next')next();
   else if(a==='prev')show(i-1);
@@ -211,7 +278,7 @@ root.addEventListener('click',function(e){
 });
 btn.addEventListener('click',start);
 
-/* yana kaydırma hareketi: sola = ileri, sağa = geri (mobil panel üzerinde) */
+/* yana kaydırma: sola = ileri, sağa = geri (mobil panel üzerinde) */
 var sx=0,sy=0;
 tip.addEventListener('touchstart',function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY},{passive:true});
 tip.addEventListener('touchend',function(e){
@@ -226,15 +293,14 @@ addEventListener('keydown',function(e){
   else if(e.key==='ArrowLeft'){e.preventDefault();show(i-1)}
   else if(e.key==='Escape'){e.preventDefault();end()}
 });
+/* kullanıcı sayfayı kendisi kaydırmaya başlarsa animasyonu bırak */
+addEventListener('wheel',settle,{passive:true});
+addEventListener('touchmove',function(e){if(anim&&!e.target.closest('.tt'))settle()},{passive:true});
 addEventListener('resize',function(){if(i>=0){lockPage(true);place()}});
-addEventListener('scroll',function(){
-  if(i<0)return;
-  root.classList.add('ns');clearTimeout(nsT);nsT=setTimeout(function(){root.classList.remove('ns')},140);
-  place();
-},{passive:true});
-/* telefon ↔ masaüstü geçişinde (döndürme, pencere boyutu) adımı yeniden kur */
+addEventListener('scroll',function(){if(i>=0&&!anim)place()},{passive:true});
+/* telefon ↔ masaüstü geçişinde adımı yeniden kur */
 (mob.addEventListener?mob.addEventListener.bind(mob,'change'):mob.addListener.bind(mob))(function(){
-  if(i>=0){lockPage(true);show(i)}
+  if(i>=0){lockPage(true);cur=null;show(i,true)}
 });
 
 /* İlk ziyarette otomatik başlat */
