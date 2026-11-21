@@ -101,6 +101,9 @@ button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .pfh h3{margin:0}
 .pclose{width:auto;margin:0;flex:none;border:1px solid var(--line);background:none;color:var(--mute);font:inherit;font-size:12px;cursor:pointer;padding:5px 11px;border-radius:980px}
 .pclose:hover{color:var(--blue);border-color:var(--blue)}
+.warn{margin:8px 0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--orange) 16%,transparent)}
+.warn p{margin:0 0 8px;font-size:13px;line-height:1.45}
+.warn button{border:1px solid var(--orange);background:none;color:var(--ink);font:inherit;font-size:13px;padding:7px 14px;border-radius:980px;cursor:pointer}
 .hint-t{display:none}
 .wrap{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 @media (pointer:coarse){
@@ -246,74 +249,223 @@ const BL='var(--blue)',GR='var(--green)',OR='var(--orange)',PU='var(--purple)';
 
 /* ===== "Neden?" ispat modu ===== */
 let pf=null,pfTimer=0;
+const nm=i=>'ABC'[i];
+const nrm=v=>{const l=Math.hypot(v.x,v.y)||1;return{x:v.x/l,y:v.y/l}};
+const angs=()=>{const [A,B,C]=P,a=d(B,C),b=d(A,C),c=d(A,B);return[ang(a,b,c),ang(b,a,c),ang(c,a,b)]};
+const rIdx=x=>{const g=[x.gA,x.gB,x.gC];return g.reduce((m,v,i)=>Math.abs(v-90)<Math.abs(g[m]-90)?i:m,0)};
 const pfH=(t,p,I)=>sq(t,unit(t,p),unit(t,I),8);
 const pbis=(p,q,c,w=2)=>{const M=mid(p,q),u=unit(p,q),n={x:-u.y,y:u.x};return ln({x:M.x-n.x*4000,y:M.y-n.y*4000},{x:M.x+n.x*4000,y:M.y+n.y*4000},c,w)};
 const bisD=x=>lerp(x.B,x.C,x.c/(x.b+x.c));
 const incI=x=>({x:(x.a*x.A.x+x.b*x.B.x+x.c*x.C.x)/(x.a+x.b+x.c),y:(x.a*x.A.y+x.b*x.B.y+x.c*x.C.y)/(x.a+x.b+x.c)});
 const cir=(O,r,c,da,fl)=>`<circle cx="${O.x}" cy="${O.y}" r="${r}" fill="${fl||'none'}" fill-opacity=".08" stroke="${c}" stroke-width="1.8" ${da?`stroke-dasharray="${da}"`:''} class="${anim?'fi':''}"/>`;
+/* eşit uzunluk işareti (küçük çentikler) */
+const tk=(p,q,n=1,c='var(--ink)')=>{const M=mid(p,q),u=unit(p,q);let s='';for(let i=0;i<n;i++){const o=(i-(n-1)/2)*6,cx0=M.x+u.x*o,cy0=M.y+u.y*o;s+=`<line x1="${cx0-u.y*6}" y1="${cy0+u.x*6}" x2="${cx0+u.y*6}" y2="${cy0-u.x*6}" stroke="${c}" stroke-width="2" stroke-linecap="round"/>`}return s};
+/* etiket: Q noktasından, from noktasının tersi yönünde */
+const lb=(Q,from,s,c,k=16)=>{const u=unit(from,Q);return tx(Q,s,c,u.x*k,u.y*k+5)};
+/* doğru parçasının ortasına, away noktasının tersi tarafına etiket */
+const nl=(p,q,away,s,c,k=16)=>{const M=mid(p,q),u=unit(p,q);let n={x:-u.y,y:u.x};if((away.x-M.x)*n.x+(away.y-M.y)*n.y>0)n={x:-n.x,y:-n.y};return tx(M,s,c,n.x*k,n.y*k+5)};
+const perpIn=(B,C,A)=>{const M=mid(B,C),u=unit(B,C);let n={x:-u.y,y:u.x};if((A.x-M.x)*n.x+(A.y-M.y)*n.y<0)n={x:-n.x,y:-n.y};return n};
+const ext=(F,p,q)=>F.t<0?ln(p,F,'var(--mute)',1.5,'5 5'):F.t>1?ln(q,F,'var(--mute)',1.5,'5 5'):'';
+const altD=(V,p,q,c,nL)=>{const F=foot(V,p,q);return ext(F,p,q)+ln(V,F,c,2.5)+sq(F,F.t>1?unit(F,p):unit(F,q),unit(F,V),9)+(nL?dot(F,c,4)+lb(F,V,nL,c,18):'')};
+const arc2=(V,p,q,r,c)=>arc(V,unit(V,p),unit(V,q),r,c);
+const hlf=(V,p,X,q,r,c,n)=>arc2(V,p,X,r,c)+arc2(V,X,q,r,c)+(n>1?arc2(V,p,X,r+5,c)+arc2(V,X,q,r+5,c):'');
+const cc3=(p,q,r)=>({x:(p.x+q.x+r.x)/3,y:(p.y+q.y+r.y)/3});
+const MM=x=>({Ma:mid(x.B,x.C),Mb:mid(x.A,x.C),Mc:mid(x.A,x.B),Kp:mid(x.B,x.G),Lp:mid(x.C,x.G)});
+const APX=x=>({A2:{x:x.B.x+x.C.x-x.A.x,y:x.B.y+x.C.y-x.A.y},B2:{x:x.A.x+x.C.x-x.B.x,y:x.A.y+x.C.y-x.B.y},C2:{x:x.A.x+x.B.x-x.C.x,y:x.A.y+x.B.y-x.C.y}});
+const B3=x=>{const D=bisD(x),Pt=lerp(x.A,D,.62);return{D,Pt,Kf:foot(Pt,x.A,x.B),Lf:foot(Pt,x.A,x.C)}};
+const I2=x=>({D:bisD(x),E:lerp(x.A,x.C,x.c/(x.c+x.a)),F:lerp(x.A,x.B,x.b/(x.a+x.b)),I:incI(x)});
+const E5=x=>{const D=bisD(x),uB=unit(x.A,x.B),uC=unit(x.A,x.C),uE=nrm({x:uC.x-uB.x,y:uC.y-uB.y});return{D,uE,uD:unit(x.A,D),X:{x:x.A.x-uB.x*90,y:x.A.y-uB.y*90},E:{x:x.A.x+uE.x*110,y:x.A.y+uE.y*110}}};
+const PP=x=>{const M=mid(x.B,x.C),n=perpIn(x.B,x.C,x.A);return{M,n,u:unit(x.B,x.C),Pt:{x:M.x+n.x*80,y:M.y+n.y*80}}};
+const RTI=x=>{const i=rIdx(x),T=[x.A,x.B,x.C],V=T[i],o=[0,1,2].filter(j=>j!==i),p=T[o[0]],q=T[o[1]];return{i,V,p,q,Mh:mid(p,q),nv:nm(i),np:nm(o[0]),nq:nm(o[1])}};
+const SIX=x=>{const m=MM(x);return[[x.A,m.Mc],[m.Mc,x.B],[x.B,m.Ma],[m.Ma,x.C],[x.C,m.Mb],[m.Mb,x.A]]};
+const CL=[BL,GR,OR,PU,'var(--red)','#5ac8fa'];
+const REQ_DIK={ok:x=>Math.abs(Math.max(x.gA,x.gB,x.gC)-90)<2,preset:'dik',msg:'Bu ispat dik üçgen içindir. Üçgeni dik açılı yapmak için düğmeyi kullan.',btn:'Dik açılı üçgene geç'};
 const PF={
- bis1:{mode:'bis',title:'Açıortay teoremi',goal:'|BD| / |DC| = c / b',steps:[
+ /* ---------- AÇIORTAY ---------- */
+ bis3:{mode:'bis',title:'Açıortayın özelliği',small:'Açıortay üzerindeki her nokta, açının kollarına eşit uzaktır (ve tersi)',goal:'P açıortay üzerinde ⇔ |PK| = |PL|',steps:[
+  {t:'AD, A açısının açıortayı olsun. Üzerinde bir P noktası alıp kollara dikmeler indirelim: PK ⟂ AB ve PL ⟂ AC. Kanıtlayacağımız şey: |PK| = |PL|.',
+   d:x=>{const q=B3(x);return ln(x.A,q.D,OR)+hlf(x.A,x.B,q.D,x.C,24,OR,2)+ln(q.Pt,q.Kf,PU,2.5)+ln(q.Pt,q.Lf,PU,2.5)+sq(q.Kf,unit(q.Kf,x.A),unit(q.Kf,q.Pt),8,PU)+sq(q.Lf,unit(q.Lf,x.A),unit(q.Lf,q.Pt),8,PU)+dot(q.Pt,OR,5.5)+dot(q.Kf,PU,3.5)+dot(q.Lf,PU,3.5)+lb(q.Pt,x.A,'P',OR,14)+lb(q.Kf,q.Pt,'K',PU)+lb(q.Lf,q.Pt,'L',PU)}},
+  {t:'AKP ve ALP üçgenlerinde: ∠KAP = ∠LAP (AD açıortay), ∠AKP = ∠ALP = 90° ve [AP] ortak kenardır. Açı–açı–kenar (AAS) eşliğine göre AKP ≅ ALP.',
+   fade:1,
+   d:x=>{const q=B3(x);return poly([x.A,q.Kf,q.Pt],GR,'none',.3)+poly([x.A,q.Lf,q.Pt],PU,'none',.3)+ln(x.A,q.Pt,OR,6)}},
+  {t:'Eş üçgenlerde karşılıklı kenarlar eşittir: |PK| = |PL| (ayrıca |AK| = |AL|). Yani açıortay üzerindeki her nokta açının iki koluna eşit uzaktır.',
+   d:x=>{const q=B3(x);return tk(q.Pt,q.Kf,1)+tk(q.Pt,q.Lf,1)+tk(x.A,q.Kf,2)+tk(x.A,q.Lf,2)},
+   n:x=>{const q=B3(x);return row('|PK|',f(d(q.Pt,q.Kf)/U))+row('|PL|',f(d(q.Pt,q.Lf)/U))+row('|AK|',f(d(x.A,q.Kf)/U))+row('|AL|',f(d(x.A,q.Lf)/U))}},
+  {t:'Tersi de doğrudur: P’den kollara inen dikmeler eşit olsun, |PK| = |PL|. AKP ve ALP dik üçgenlerinde [AP] ortak hipotenüs, |PK| = |PL| dik kenardır. Hipotenüs–dik kenar eşliğine göre AKP ≅ ALP; buradan ∠KAP = ∠LAP bulunur, yani AP açıortaydır. ∎',
+   d:x=>{const q=B3(x);return ln(x.A,q.Pt,OR,3)+hlf(x.A,x.B,q.Pt,x.C,36,BL,1)},
+   n:x=>{const q=B3(x);return row('∠KAP',f(angAt(x.A,q.Kf,q.Pt),1)+'°')+row('∠LAP',f(angAt(x.A,q.Lf,q.Pt),1)+'°')}}]},
+ bis1:{mode:'bis',title:'Açıortay teoremi',small:'Açıortay karşı kenarı komşu kenarların oranında böler',goal:'|BD| / |DC| = c / b',steps:[
   {t:'AD, A açısının açıortayı olsun ve BC kenarını D noktasında kessin. Kanıtlayacağımız şey: |BD| / |DC| = c / b.',
-   d:x=>{const D=bisD(x),u1=unit(x.A,x.B),ux=unit(x.A,D),u2=unit(x.A,x.C);return ln(x.A,D,OR)+arc(x.A,u1,ux,24,OR)+arc(x.A,u1,ux,29,OR)+arc(x.A,ux,u2,24,OR)+arc(x.A,ux,u2,29,OR)+dot(D,OR)+tx(D,'D',OR,0,-12)}},
-  {t:'ABD ve ADC üçgenlerinin A köşesinden BC’ye inen yüksekliği ortaktır (h). Bu yüzden alanlarının oranı tabanlarının oranına eşittir: Alan(ABD) / Alan(ADC) = |BD| / |DC|.',
-   d:x=>{const D=bisD(x),Ha=foot(x.A,x.B,x.C);return poly([x.A,x.B,D],GR,'none',.22)+poly([x.A,D,x.C],PU,'none',.22)+ln(x.A,Ha,'var(--mute)',2,'5 4')+sq(Ha,unit(Ha,x.C),unit(Ha,x.A),8)+tx(mid(x.A,Ha),'h','var(--mute)',-10,0)+ln(x.B,D,GR,6)+ln(D,x.C,PU,6)}},
-  {t:'D noktası açıortay üzerinde olduğundan AB ve AC kenarlarına eşit uzaklıktadır (r). Aynı üçgenlere bu kez AB ve AC tabanlarından bakalım: yükseklikler r, tabanlar c ve b. Alan(ABD) / Alan(ADC) = (c·r) / (b·r) = c / b.',
-   d:x=>{const D=bisD(x),Fd=foot(D,x.A,x.B),Ed=foot(D,x.A,x.C);return ln(D,Fd,OR,2)+ln(D,Ed,OR,2)+pfH(Fd,x.A,D)+pfH(Ed,x.A,D)+dot(Fd,OR,3.5)+dot(Ed,OR,3.5)+tx(mid(D,Fd),'r',OR,-10,0)+tx(mid(D,Ed),'r',OR,10,0)}},
-  {t:'Aynı alan oranı iki farklı yoldan bulundu, o halde |BD| / |DC| = c / b. ∎',
-   d:x=>{const D=bisD(x);return tx(mid(x.B,D),'|BD|',GR,0,24)+tx(mid(D,x.C),'|DC|',PU,0,24)},
+   d:x=>{const D=bisD(x);return ln(x.A,D,OR)+hlf(x.A,x.B,D,x.C,24,OR,2)+dot(D,OR)+lb(D,x.A,'D',OR,14)}},
+  {t:'ABD ve ADC üçgenlerinin A köşesinden BC’ye inen yüksekliği ortaktır (h). Tabanları |BD| ve |DC| olduğundan alanlarının oranı tabanların oranına eşittir: Alan(ABD) / Alan(ADC) = |BD| / |DC|.',
+   fade:1,
+   d:x=>{const D=bisD(x),Ha=foot(x.A,x.B,x.C);return poly([x.A,x.B,D],GR,'none',.24)+poly([x.A,D,x.C],PU,'none',.24)+ext(Ha,x.B,x.C)+ln(x.A,Ha,'var(--mute)',2,'5 4')+sq(Ha,unit(Ha,x.C),unit(Ha,x.A),8)+tx(mid(x.A,Ha),'h','var(--mute)',-10,0)+ln(x.B,D,GR,6)+ln(D,x.C,PU,6)},
+   n:x=>{const D=bisD(x);return row('Alan(ABD) / Alan(ADC)',f(area(x.A,x.B,D)/area(x.A,D,x.C)))+row('|BD| / |DC|',f(d(x.B,D)/d(D,x.C)))}},
+  {t:'D açıortay üzerinde olduğundan AB ve AC kenarlarına eşit uzaktır (r); bunu “Açıortayın özelliği” ispatında gördük. ABD’yi AB tabanından, ADC’yi AC tabanından ölçersek yükseklikler r, tabanlar c ve b olur: Alan(ABD) = c·r / 2 ve Alan(ADC) = b·r / 2.',
+   d:x=>{const D=bisD(x),Kf=foot(D,x.A,x.B),Lf=foot(D,x.A,x.C);return ln(x.A,x.B,GR,5)+ln(x.A,x.C,PU,5)+ln(D,Kf,OR,2.5)+ln(D,Lf,OR,2.5)+sq(Kf,unit(Kf,x.A),unit(Kf,D),8,OR)+sq(Lf,unit(Lf,x.A),unit(Lf,D),8,OR)+tk(D,Kf,1)+tk(D,Lf,1)+dot(Kf,OR,3.5)+dot(Lf,OR,3.5)+nl(D,Kf,x.C,'r',OR,12)+nl(D,Lf,x.B,'r',OR,12)+nl(x.A,x.B,x.C,'c',GR,16)+nl(x.A,x.C,x.B,'b',PU,16)},
+   n:x=>{const D=bisD(x),r=d(D,foot(D,x.A,x.B))/U;return row('Alan(ABD)',f(area(x.A,x.B,D)/(U*U)))+row('c·r / 2',f(x.c/U*r/2))+row('Alan(ADC)',f(area(x.A,D,x.C)/(U*U)))+row('b·r / 2',f(x.b/U*r/2))}},
+  {t:'Her iki alan oranı da aynı ifadeye eşittir: |BD| / |DC| = Alan(ABD) / Alan(ADC) = (c·r / 2) / (b·r / 2) = c / b. ∎',
+   d:x=>{const D=bisD(x);return ln(x.B,D,GR,7)+ln(D,x.C,PU,7)+nl(x.B,D,x.A,'|BD|',GR,22)+nl(D,x.C,x.A,'|DC|',PU,22)},
    n:x=>{const D=bisD(x);return row('|BD| / |DC|',f(d(x.B,D)/d(D,x.C)))+row('c / b',f(x.c/x.b))}}]},
- bis2:{mode:'bis',title:'İç teğet çemberin merkezi I',goal:'I, üç kenara da eşit uzaktır',steps:[
-  {t:'A ve B köşelerinin açıortayları I noktasında kesişsin. I’nın üç kenara da eşit uzak olduğunu göstereceğiz.',
-   d:x=>{const D=bisD(x),E=lerp(x.A,x.C,x.c/(x.c+x.a)),I=incI(x);return ln(x.A,D,OR)+ln(x.B,E,OR)+dot(I,BL,6)+tx(I,'I',BL,12,-10)}},
-  {t:'I, A açıortayı üzerinde olduğundan AB ve AC kenarlarına eşit uzaktır.',
-   d:x=>{const I=incI(x),t1=foot(I,x.A,x.B),t2=foot(I,x.A,x.C);return ln(I,t1,GR,2,'4 4')+ln(I,t2,GR,2,'4 4')+pfH(t1,x.A,I)+pfH(t2,x.A,I)+dot(t1,GR,3.5)+dot(t2,GR,3.5)},
+ bis2:{mode:'bis',title:'İç teğet çemberin merkezi I',small:'Üç açıortay tek noktada kesişir; I üç kenara da eşit uzaktır',goal:'I, üç kenara da eşit uzaktır',steps:[
+  {t:'A ve B köşelerinin açıortayları I noktasında kesişsin. I’nın üç kenara da eşit uzak olduğunu ve üçüncü açıortayın da I’dan geçtiğini göstereceğiz.',
+   d:x=>{const q=I2(x);return ln(x.A,q.D,OR)+ln(x.B,q.E,OR)+hlf(x.A,x.B,q.D,x.C,22,OR,1)+hlf(x.B,x.A,q.E,x.C,22,OR,1)+dot(q.I,BL,6)+tx(q.I,'I',BL,12,-10)}},
+  {t:'I, A açıortayı üzerinde olduğundan AB ve AC kenarlarına eşit uzaktır (açıortayın özelliği).',
+   d:x=>{const q=I2(x),Kf=foot(q.I,x.A,x.B),Lf=foot(q.I,x.A,x.C);return ln(q.I,Kf,GR,2,'4 4')+ln(q.I,Lf,GR,2,'4 4')+pfH(Kf,x.A,q.I)+pfH(Lf,x.A,q.I)+dot(Kf,GR,3.5)+dot(Lf,GR,3.5)+tk(q.I,Kf)+tk(q.I,Lf)},
    n:x=>{const I=incI(x);return row('I → AB',f(d(I,foot(I,x.A,x.B))/U))+row('I → AC',f(d(I,foot(I,x.A,x.C))/U))}},
-  {t:'I, B açıortayı üzerinde olduğundan BA ve BC kenarlarına da eşit uzaktır. Böylece I, üç kenara da aynı uzaklıktadır.',
-   d:x=>{const I=incI(x),t3=foot(I,x.B,x.C);return ln(I,t3,PU,2,'4 4')+pfH(t3,x.B,I)+dot(t3,PU,3.5)},
+  {t:'I, B açıortayı üzerinde olduğundan BA ve BC kenarlarına da eşit uzaktır. Demek ki I, üç kenara da aynı uzaklıktadır.',
+   d:x=>{const q=I2(x),Mf=foot(q.I,x.B,x.C);return ln(q.I,Mf,PU,2,'4 4')+pfH(Mf,x.B,q.I)+dot(Mf,PU,3.5)+tk(q.I,Mf)},
    n:x=>{const I=incI(x);return row('I → AB',f(d(I,foot(I,x.A,x.B))/U))+row('I → AC',f(d(I,foot(I,x.A,x.C))/U))+row('I → BC',f(d(I,foot(I,x.B,x.C))/U))}},
-  {t:'Üç uzaklık da eşit (r). C köşesinin kollarına da eşit uzak olduğu için I, C açıortayı üzerindedir: üç açıortay I’da kesişir. I merkezli, r yarıçaplı çember üç kenara teğettir. ∎',
-   d:x=>{const I=incI(x),F=lerp(x.A,x.B,x.b/(x.a+x.b));return ln(x.C,F,OR)+cir(I,x.K/((x.a+x.b+x.c)/2),BL,'',BL)+dot(I,BL,6)}}]},
- med1:{mode:'med',title:'Kenarortaylar 2 : 1 böler',goal:'|BG| : |GMb| = 2 : 1',steps:[
-  {t:'BMb ve CMc kenarortayları G noktasında kesişsin. Mb ve Mc orta noktalarını birleştirelim.',
-   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return ln(x.B,Mb,GR)+ln(x.C,Mc,GR)+ln(Mb,Mc,PU,3)+dot(Mb,GR)+dot(Mc,GR)+tx(Mb,'M_b',GR,22,4)+tx(Mc,'M_c',GR,-24,4)+dot(x.G,BL,6)+tx(x.G,'G',BL,14,-10)}},
-  {t:'ABC üçgeninde Mb ve Mc kenar orta noktalarıdır. Orta taban teoremine göre MbMc ∥ BC ve |MbMc| = |BC| / 2.',
-   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return ln(x.B,x.C,BL,5)+tx(mid(x.B,x.C),'a',BL,0,24)+tx(mid(Mb,Mc),'a/2',PU,0,-10)},
-   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|MbMc|',f(d(Mb,Mc)/U))+row('a / 2',f(x.a/2/U))}},
-  {t:'MbMc ∥ BC olduğundan ters açılar eşittir: GBC ve GMbMc üçgenleri benzerdir. Benzerlik oranı |BC| / |MbMc| = 2.',
-   d:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return poly([x.G,x.B,x.C],BL,'none',.2)+poly([x.G,Mc,Mb],OR,'none',.4)},
-   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|BC| / |MbMc|',f(x.a/d(Mb,Mc)))}},
-  {t:'Benzerlikten |GB| = 2·|GMb| ve |GC| = 2·|GMc|. Aynı işlem A’dan çıkan kenarortay için de yapılırsa BMb’yi B’den itibaren yine 2 : 1 bölen tek nokta bulunur: bu da G’dir. Üç kenarortay G’de kesişir ve her biri köşeden itibaren 2 : 1 bölünür. ∎',
-   d:x=>{const Mb=mid(x.A,x.C),Ma=mid(x.B,x.C);return ln(x.A,Ma,GR)+dot(Ma,GR)+tx(Ma,'Mₐ',GR,0,22)+ln(x.B,x.G,BL,7)+ln(x.G,Mb,OR,7)+tx(mid(x.B,x.G),'2k',BL,-16,0)+tx(mid(x.G,Mb),'k',OR,16,0)},
-   n:x=>{const Mb=mid(x.A,x.C),Mc=mid(x.A,x.B);return row('|GB| / |GMb|',f(d(x.G,x.B)/d(x.G,Mb)))+row('|GC| / |GMc|',f(d(x.G,x.C)/d(x.G,Mc)))}}]},
- per1:{mode:'per',title:'Orta dikme ve çevrel merkez',goal:'P orta dik üzerinde ⇒ |PB| = |PC|',steps:[
-  {t:'BC kenarının orta noktası M olsun; orta dikme M’den dik olarak geçer. Üzerinde herhangi bir P noktası alalım. Kanıtlayacağımız şey: |PB| = |PC|.',
-   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return pbis(x.B,x.C,OR)+sq(M,u,n,9)+dot(M,OR)+tx(M,'M',OR,0,22)+dot(Pt,GR,5.5)+tx(Pt,'P',GR,14,-8)}},
-  {t:'PMB ve PMC üçgenlerine bakalım: |BM| = |MC| (M orta nokta), |PM| ortak kenar, ∠PMB = ∠PMC = 90°. Kenar–açı–kenar eşliğine göre iki üçgen eştir.',
-   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return poly([Pt,M,x.B],GR,'none',.25)+poly([Pt,M,x.C],PU,'none',.25)+ln(x.B,M,GR,6)+ln(M,x.C,PU,6)}},
-  {t:'Eş üçgenlerde karşılıklı kenarlar eşittir: |PB| = |PC|. Yani orta dik üzerindeki her nokta B ve C’ye eşit uzaktır.',
-   d:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return ln(Pt,x.B,GR,2.5)+ln(Pt,x.C,PU,2.5)},
-   n:x=>{const M=mid(x.B,x.C),u=unit(x.B,x.C),n={x:-u.y,y:u.x},Pt={x:M.x+n.x*90,y:M.y+n.y*90};return row('|PB|',f(d(Pt,x.B)/U))+row('|PC|',f(d(Pt,x.C)/U))}},
-  {t:'Tersi de doğrudur: B ve C’ye eşit uzak her nokta orta dikmenin üzerindedir. AB ve BC orta dikmeleri O’da kesişsin: |OA| = |OB| ve |OB| = |OC| olduğundan |OA| = |OC|; yani O, AC’nin orta dikmesi üzerindedir. Üç orta dikme O’da kesişir ve O, çevrel çemberin merkezidir. ∎',
-   d:x=>{const O=circ(x.A,x.B,x.C);FIT.push(O);return pbis(x.A,x.B,OR)+pbis(x.A,x.C,OR)+cir(O,d(O,x.A),BL,'',BL)+ln(O,x.A,PU,1.8,'6 5')+ln(O,x.B,PU,1.8,'6 5')+ln(O,x.C,PU,1.8,'6 5')+dot(O,BL,6)+tx(O,'O',BL,14,-10)},
-   n:x=>{const O=circ(x.A,x.B,x.C);return row('|OA|',f(d(O,x.A)/U))+row('|OB|',f(d(O,x.B)/U))+row('|OC|',f(d(O,x.C)/U))}}]},
- alt1:{mode:'alt',title:'Yükseklikler tek noktada kesişir',goal:'Üç yükseklik H noktasında kesişir',steps:[
-  {t:'Her köşeden karşı kenara paralel çizelim. Bu doğrular A′B′C′ adlı büyük bir üçgen oluşturur. Küçük üçgenimiz bunun içinde kalır.',
-   d:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y};FIT.push(A2,B2,C2);
-     const G0=x.G,l=(V,s2)=>{const u=unit(G0,V);return tx(V,s2,PU,u.x*22,u.y*22+5)};
-     return poly([A2,B2,C2],'none',PU,1,'7 5')+l(A2,'A′')+l(B2,'B′')+l(C2,'C′')}},
+  {t:'I, AC ve BC kenarlarına eşit uzak olduğundan C açısının açıortayı üzerindedir (açıortayın özelliğinin karşıtı). Böylece üç açıortay I’da kesişir.',
+   d:x=>{const q=I2(x);return ln(x.C,q.F,OR)+hlf(x.C,x.A,q.F,x.B,22,OR,1)+dot(q.I,BL,6)}},
+  {t:'I merkezli, r yarıçaplı çember üç kenara da teğettir: iç teğet çember. ∎',
+   d:x=>{const q=I2(x);return cir(q.I,x.K/((x.a+x.b+x.c)/2),BL,'',BL)+dot(q.I,BL,6)},
+   n:x=>{const I=incI(x);return row('r',f(x.K/((x.a+x.b+x.c)/2)/U))}}]},
+ bis4:{mode:'bis',title:'∠BIC = 90° + A/2',small:'İç teğet çemberin merkezinden BC’nin göründüğü açı',goal:'∠BIC = 90° + A / 2',steps:[
+  {t:'BI ve CI, B ve C açılarının açıortaylarıdır. BIC üçgeninin I açısını bulalım.',
+   d:x=>{const I=incI(x);return poly([x.B,I,x.C],BL,'none',.2)+ln(x.B,I,OR)+ln(x.C,I,OR)+dot(I,BL,6)+tx(I,'I',BL,12,-10)}},
+  {t:'BIC üçgeninde ∠IBC = B/2 ve ∠ICB = C/2 (açıortay). İç açılar toplamı 180° olduğundan ∠BIC = 180° − (B/2 + C/2).',
+   d:x=>{const I=incI(x);return arc2(x.B,x.C,I,26,OR)+arc2(x.B,I,x.A,26,OR)+arc2(x.C,x.B,I,26,OR)+arc2(x.C,I,x.A,26,OR)+arc2(I,x.B,x.C,22,BL)},
+   n:x=>{const I=incI(x);return row('B / 2',f(x.gB/2,1)+'°')+row('C / 2',f(x.gC/2,1)+'°')+row('∠BIC (ölçülen)',f(angAt(I,x.B,x.C),1)+'°')}},
+  {t:'ABC üçgeninde A + B + C = 180° olduğundan B/2 + C/2 = 90° − A/2. Buradan ∠BIC = 180° − (90° − A/2) = 90° + A/2. ∎',
+   d:x=>arc2(x.A,x.B,x.C,32,PU),
+   n:x=>{const I=incI(x);return row('∠BIC (ölçülen)',f(angAt(I,x.B,x.C),1)+'°')+row('90° + A/2',f(90+x.gA/2,1)+'°')}}]},
+ bis5:{mode:'bis',title:'İç ve dış açıortay diktir',small:'Aynı köşedeki iç ve dış açıortay birbirine diktir',goal:'∠DAE = 90°',steps:[
+  {t:'AD, A açısının iç açıortayı olsun. BA’yı A’nın ötesine X’e kadar uzatalım; ∠CAX dış açıdır ve ölçüsü 180° − A’dır.',
+   d:x=>{const q=E5(x);return ln(x.A,q.D,OR)+hlf(x.A,x.B,q.D,x.C,24,OR,2)+ln(x.A,q.X,'var(--mute)',2,'6 5')+dot(q.X,'var(--mute)',3.5)+lb(q.X,x.A,'X','var(--mute)',14)+arc2(x.A,x.C,q.X,50,BL)}},
+  {t:'AE, dış açı ∠CAX’in açıortayı olsun: ∠CAE = ∠EAX = (180° − A) / 2.',
+   d:x=>{const q=E5(x);return ln(x.A,q.E,PU,2.5)+dot(q.E,PU,4)+lb(q.E,x.A,'E',PU,14)+hlf(x.A,x.C,q.E,q.X,36,PU,2)}},
+  {t:'∠DAE = ∠DAC + ∠CAE = A/2 + (180° − A)/2 = 90°. Yani bir köşedeki iç ve dış açıortaylar birbirine diktir. ∎',
+   d:x=>{const q=E5(x);return ln({x:x.A.x-q.uE.x*4000,y:x.A.y-q.uE.y*4000},{x:x.A.x+q.uE.x*4000,y:x.A.y+q.uE.y*4000},PU,2)+sq(x.A,q.uD,q.uE,14,PU)},
+   n:x=>{const q=E5(x);return row('∠DAE',f(angAt(x.A,q.D,q.E),1)+'°')}}]},
+ /* ---------- KENARORTAY ---------- */
+ med1:{mode:'med',title:'Kenarortaylar 2 : 1 böler',small:'Üç kenarortay G’de kesişir ve G her birini köşeden 2 : 1 böler',goal:'|BG| : |GMb| = 2 : 1',steps:[
+  {t:'BMb ve CMc kenarortayları G noktasında kesişsin (Mb ve Mc, AC ve AB’nin orta noktaları). Kanıtlayacağımız şey: |BG| = 2·|GMb|.',
+   d:x=>{const m=MM(x);return ln(x.B,m.Mb,GR)+ln(x.C,m.Mc,GR)+dot(m.Mb,GR)+dot(m.Mc,GR)+lb(m.Mb,x.G,'M_b',GR,22)+lb(m.Mc,x.G,'M_c',GR,22)+dot(x.G,BL,6)+tx(x.G,'G',BL,14,-10)}},
+  {t:'GB ve GC’nin orta noktaları K ve L olsun; K ile L’yi birleştirelim.',
+   d:x=>{const m=MM(x);return ln(m.Kp,m.Lp,OR,3)+dot(m.Kp,OR)+dot(m.Lp,OR)+lb(m.Kp,x.A,'K',OR,14)+lb(m.Lp,x.A,'L',OR,14)}},
+  {t:'ABC üçgeninde Mc ve Mb orta noktalardır: McMb ∥ BC ve |McMb| = a/2. GBC üçgeninde K ve L orta noktalardır: KL ∥ BC ve |KL| = a/2 (orta taban teoremi).',
+   d:x=>{const m=MM(x);return ln(x.B,x.C,BL,5)+nl(x.B,x.C,x.A,'a',BL,20)+ln(m.Mc,m.Mb,PU,4)+tk(m.Mc,m.Mb,1)+tk(m.Kp,m.Lp,1)+nl(m.Mc,m.Mb,x.B,'a/2',PU,14)},
+   n:x=>{const m=MM(x);return row('|McMb|',f(d(m.Mc,m.Mb)/U))+row('|KL|',f(d(m.Kp,m.Lp)/U))+row('a / 2',f(x.a/2/U))}},
+  {t:'McMb ∥ KL ve |McMb| = |KL| olduğundan McMbLK bir paralelkenardır.',
+   fade:1,
+   d:x=>{const m=MM(x);return poly([m.Mc,m.Mb,m.Lp,m.Kp],OR,OR,.16)}},
+  {t:'Paralelkenarın köşegenleri birbirini ortalar. Köşegenler McL ve MbK kenarortayların üzerindedir; kesişimleri G olduğundan G, MbK’nin orta noktasıdır: |GMb| = |GK|. K, GB’nin orta noktası olduğundan |GK| = |KB|. Böylece |BG| = |BK| + |KG| = 2·|GMb|. Aynısı C için de geçerlidir: |CG| = 2·|GMc|.',
+   d:x=>{const m=MM(x);return ln(x.B,m.Kp,BL,7)+ln(m.Kp,x.G,BL,7)+ln(x.G,m.Mb,OR,7)+tk(x.B,m.Kp,1)+tk(m.Kp,x.G,1)+tk(x.G,m.Mb,1)+nl(x.B,x.G,x.C,'2k',BL,16)+nl(x.G,m.Mb,x.C,'k',OR,16)},
+   n:x=>{const m=MM(x);return row('|GB| / |GMb|',f(d(x.G,x.B)/d(x.G,m.Mb)))+row('|GC| / |GMc|',f(d(x.G,x.C)/d(x.G,m.Mc)))}},
+  {t:'A ve B köşelerinden çıkan kenarortaylar için aynı işlem yapılırsa, kesişimleri de BMb üzerinde B’den itibaren 2 : 1 oranında bir nokta olur. BMb üzerinde böyle tek bir nokta olduğundan bu nokta G’dir. Demek ki üç kenarortay G’de kesişir ve G her birini köşeden itibaren 2 : 1 böler. ∎',
+   d:x=>{const m=MM(x);return ln(x.A,m.Ma,GR)+dot(m.Ma,GR)+lb(m.Ma,x.G,'Mₐ',GR,22)+ln(x.A,x.G,BL,7)+ln(x.G,m.Ma,OR,7)+nl(x.A,x.G,x.B,'2k',BL,16)+nl(x.G,m.Ma,x.B,'k',OR,16)},
+   n:x=>{const m=MM(x);return row('|AG| / |GMₐ|',f(d(x.A,x.G)/d(x.G,m.Ma)))}}]},
+ med2:{mode:'med',title:'Kenarortay alanı ikiye böler',small:'Her kenarortay üçgeni eşit alanlı iki parçaya ayırır',goal:'Alan(ABMₐ) = Alan(AMₐC) = Alan(ABC) / 2',steps:[
+  {t:'AMₐ kenarortayını çizelim (Mₐ, BC’nin orta noktası). Bu durumda |BMₐ| = |MₐC| olur.',
+   d:x=>{const Ma=mid(x.B,x.C);return ln(x.A,Ma,GR)+dot(Ma,GR)+lb(Ma,x.A,'Mₐ',GR,20)+tk(x.B,Ma,1)+tk(Ma,x.C,1)}},
+  {t:'ABMₐ ve AMₐC üçgenlerinin A köşesinden BC’ye inen yüksekliği ortaktır (h). Tabanları da eşittir: |BMₐ| = |MₐC|.',
+   fade:1,
+   d:x=>{const Ma=mid(x.B,x.C),Ha=foot(x.A,x.B,x.C);return poly([x.A,x.B,Ma],GR,'none',.24)+poly([x.A,Ma,x.C],PU,'none',.24)+ext(Ha,x.B,x.C)+ln(x.A,Ha,'var(--mute)',2,'5 4')+sq(Ha,unit(Ha,x.C),unit(Ha,x.A),8)+tx(mid(x.A,Ha),'h','var(--mute)',-10,0)+ln(x.B,Ma,GR,6)+ln(Ma,x.C,PU,6)}},
+  {t:'Alan(ABMₐ) = |BMₐ|·h / 2 ve Alan(AMₐC) = |MₐC|·h / 2. Tabanlar ve yükseklik eşit olduğundan alanlar eşittir; her biri Alan(ABC) / 2’dir. ∎',
+   d:x=>{const Ma=mid(x.B,x.C);return poly([x.A,x.B,Ma],GR,'none',.3)+poly([x.A,Ma,x.C],PU,'none',.3)+tx(cc3(x.A,x.B,Ma),'½',GR)+tx(cc3(x.A,Ma,x.C),'½',PU)},
+   n:x=>{const Ma=mid(x.B,x.C);return row('Alan(ABMₐ)',f(area(x.A,x.B,Ma)/(U*U)))+row('Alan(AMₐC)',f(area(x.A,Ma,x.C)/(U*U)))+row('Alan(ABC) / 2',f(x.K/(U*U)/2))}}]},
+ med3:{mode:'med',title:'Altı eş alanlı üçgen',small:'Üç kenarortay üçgeni eşit alanlı altı parçaya ayırır',goal:'Altı üçgenin her birinin alanı Alan(ABC) / 6',steps:[
+  {t:'Üç kenarortay üçgeni altı küçük üçgene ayırır. Hepsinin alanının Alan(ABC) / 6 olduğunu göstereceğiz.',
+   d:x=>{const m=MM(x);return SIX(x).map(([p,q],i)=>poly([p,q,x.G],CL[i],'none',.3)+tx(cc3(p,q,x.G),String(i+1),'var(--ink)')).join('')+ln(x.A,m.Ma,GR)+ln(x.B,m.Mb,GR)+ln(x.C,m.Mc,GR)+dot(x.G,BL,6)}},
+  {t:'Kenar orta noktaları yüzünden |AMc| = |McB|, |BMₐ| = |MₐC|, |CMb| = |MbA|. Her çiftin tepe noktası G ortak olduğundan yükseklikleri de eşittir: Alan(1) = Alan(2), Alan(3) = Alan(4), Alan(5) = Alan(6).',
+   d:x=>{const m=MM(x);return tk(x.A,m.Mc,1)+tk(m.Mc,x.B,1)+tk(x.B,m.Ma,2)+tk(m.Ma,x.C,2)+tk(x.C,m.Mb,3)+tk(m.Mb,x.A,3)},
+   n:x=>{const m=MM(x);return row('Alan(1)',f(area(x.A,m.Mc,x.G)/(U*U)))+row('Alan(2)',f(area(m.Mc,x.B,x.G)/(U*U)))}},
+  {t:'G, kenarortayı 2 : 1 böldüğünden |AG| = 2·|GMₐ|. ABG ve GBMₐ üçgenlerinin B’den AMₐ’ya inen yüksekliği ortaktır; tabanları 2k ve k olduğundan Alan(ABG) = 2·Alan(GBMₐ), yani Alan(1) + Alan(2) = 2·Alan(3).',
+   fade:1,
+   d:x=>{const m=MM(x);return poly([x.A,x.B,x.G],BL,'none',.28)+poly([x.B,m.Ma,x.G],OR,'none',.5)+nl(x.A,x.G,x.B,'2k',BL,16)+nl(x.G,m.Ma,x.B,'k',OR,16)},
+   n:x=>{const m=MM(x);return row('Alan(ABG) / Alan(GBMₐ)',f(area(x.A,x.B,x.G)/area(x.B,m.Ma,x.G)))}},
+  {t:'Alan(1) = Alan(2) ve Alan(1) + Alan(2) = 2·Alan(3) olduğundan Alan(1) = Alan(2) = Alan(3). Alan(3) = Alan(4) olduğundan dördü de eşit olur. Aynı akıl yürütme diğer kenarortaylar için de geçerlidir: altı alanın hepsi eşittir ve toplamları Alan(ABC) olduğundan her biri Alan(ABC) / 6’dır. ∎',
+   d:x=>SIX(x).map(([p,q],i)=>poly([p,q,x.G],CL[i],'none',.35)+tx(cc3(p,q,x.G),'1/6','var(--ink)',0,15)).join(''),
+   n:x=>{const m=MM(x);return row('Alan(ABC) / 6',f(x.K/(U*U)/6))+row('Alan(1)',f(area(x.A,m.Mc,x.G)/(U*U)))}}]},
+ med4:{mode:'med',title:'Dik üçgende kenarortay',small:'Hipotenüse ait kenarortay, hipotenüsün yarısına eşittir',goal:'Dik köşeden inen kenarortay = hipotenüs / 2',req:REQ_DIK,steps:[
+  {t:x=>{const r=RTI(x);return `${r.nv} köşesi dik açıdır; hipotenüs ${r.np}${r.nq}, orta noktası M. Kanıtlayacağımız şey: |${r.nv}M| = |${r.np}${r.nq}| / 2.`},
+   d:x=>{const r=RTI(x);return sq(r.V,unit(r.V,r.p),unit(r.V,r.q),12)+ln(r.p,r.q,BL,5)+ln(r.V,r.Mh,GR,3)+dot(r.Mh,GR,5.5)+lb(r.Mh,r.V,'M',GR,16)}},
+  {t:x=>{const r=RTI(x);return `${r.np} ve ${r.nq} köşelerinden dik kenarlara paraleller çizip kesiştirelim: D noktası. ${r.nv}${r.np}D${r.nq} dört açısı da 90° olan bir dikdörtgendir.`},
+   fade:1,
+   d:x=>{const r=RTI(x),Dp={x:r.p.x+r.q.x-r.V.x,y:r.p.y+r.q.y-r.V.y};FIT.push(Dp);return poly([r.V,r.p,Dp,r.q],PU,PU,.1,'6 5')+dot(Dp,PU)+lb(Dp,r.V,'D',PU,14)}},
+  {t:x=>{const r=RTI(x);return `Dikdörtgenin köşegenleri eşit uzunluktadır ve birbirini ortalar: |${r.nv}D| = |${r.np}${r.nq}| ve ortak orta nokta M’dir.`},
+   d:x=>{const r=RTI(x),Dp={x:r.p.x+r.q.x-r.V.x,y:r.p.y+r.q.y-r.V.y};return ln(r.V,Dp,PU,3)+tk(r.V,r.Mh,2)+tk(r.Mh,Dp,2)+tk(r.p,r.Mh,1)+tk(r.Mh,r.q,1)},
+   n:x=>{const r=RTI(x),Dp={x:r.p.x+r.q.x-r.V.x,y:r.p.y+r.q.y-r.V.y};return row('|'+r.nv+'D|',f(d(r.V,Dp)/U))+row('|'+r.np+r.nq+'|',f(d(r.p,r.q)/U))}},
+  {t:x=>{const r=RTI(x);return `M, ${r.nv}D’nin orta noktası olduğundan |${r.nv}M| = |${r.nv}D| / 2 = |${r.np}${r.nq}| / 2. Ayrıca |M${r.np}| = |M${r.nq}| = |M${r.nv}| olduğundan M üç köşeye eşit uzaktır: hipotenüsün orta noktası çevrel çemberin merkezidir. ∎`},
+   d:x=>{const r=RTI(x);return cir(r.Mh,d(r.p,r.q)/2,PU,'6 5',PU)},
+   n:x=>{const r=RTI(x);return row('|'+r.nv+'M|',f(d(r.V,r.Mh)/U))+row('|'+r.np+r.nq+'| / 2',f(d(r.p,r.q)/2/U))}}]},
+ /* ---------- KENAR ORTA DİK ---------- */
+ per1:{mode:'per',title:'Orta dikmenin özelliği',small:'Orta dikme üzerindeki her nokta, uçlara eşit uzaktır (ve tersi)',goal:'P orta dikme üzerinde ⇔ |PB| = |PC|',steps:[
+  {t:'BC kenarının orta noktası M olsun; orta dikme M’den BC’ye dik olarak geçer. Üzerinde herhangi bir P noktası alalım. Kanıtlayacağımız şey: |PB| = |PC|.',
+   d:x=>{const p=PP(x);return pbis(x.B,x.C,OR)+sq(p.M,p.u,p.n,9)+tk(x.B,p.M,1)+tk(p.M,x.C,1)+dot(p.M,OR)+lb(p.M,p.Pt,'M',OR,16)+dot(p.Pt,GR,5.5)+lb(p.Pt,p.M,'P',GR,20)}},
+  {t:'PMB ve PMC üçgenlerinde: |BM| = |MC| (M orta nokta), ∠PMB = ∠PMC = 90° ve [PM] ortak kenardır. Kenar–açı–kenar eşliğine göre PMB ≅ PMC.',
+   fade:1,
+   d:x=>{const p=PP(x);return poly([p.Pt,p.M,x.B],GR,'none',.25)+poly([p.Pt,p.M,x.C],PU,'none',.25)+ln(p.Pt,p.M,OR,5)+sq(p.M,unit(p.M,x.B),p.n,9)}},
+  {t:'Eş üçgenlerde karşılıklı kenarlar eşittir: |PB| = |PC|. Yani orta dikme üzerindeki her nokta B ve C’ye eşit uzaktır.',
+   d:x=>{const p=PP(x);return ln(p.Pt,x.B,GR,2.5)+ln(p.Pt,x.C,PU,2.5)+tk(p.Pt,x.B,2)+tk(p.Pt,x.C,2)},
+   n:x=>{const p=PP(x);return row('|PB|',f(d(p.Pt,x.B)/U))+row('|PC|',f(d(p.Pt,x.C)/U))}},
+  {t:'Tersi de doğrudur: |PB| = |PC| olsun ve M, BC’nin orta noktası olsun. PMB ve PMC üçgenlerinde |PB| = |PC|, |BM| = |MC| ve [PM] ortaktır; kenar–kenar–kenar eşliğiyle ∠PMB = ∠PMC. Bu iki açının toplamı 180° olduğundan her biri 90°’dir: PM ⟂ BC, yani P orta dikme üzerindedir. ∎',
+   d:x=>{const p=PP(x);return arc2(p.M,x.B,p.Pt,19,BL)+arc2(p.M,p.Pt,x.C,19,BL)+ln(p.Pt,p.M,OR,3)},
+   n:x=>{const p=PP(x);return row('∠PMB',f(angAt(p.M,p.Pt,x.B),1)+'°')+row('∠PMC',f(angAt(p.M,p.Pt,x.C),1)+'°')}}]},
+ per2:{mode:'per',title:'Orta dikmeler ve çevrel çember',small:'Üç orta dikme tek noktada kesişir; O çevrel çemberin merkezidir',goal:'|OA| = |OB| = |OC|',steps:[
+  {t:'AB ve BC kenarlarının orta dikmelerini çizelim. AB ile BC paralel olmadığından orta dikmeler bir O noktasında kesişir.',
+   d:x=>{const O=circ(x.A,x.B,x.C);FIT.push(O);return pbis(x.A,x.B,OR)+pbis(x.B,x.C,OR)+dot(mid(x.A,x.B),OR)+dot(mid(x.B,x.C),OR)+dot(O,BL,6)+tx(O,'O',BL,14,-10)}},
+  {t:'O, AB’nin orta dikmesi üzerinde olduğundan |OA| = |OB|; BC’nin orta dikmesi üzerinde olduğundan |OB| = |OC| (orta dikmenin özelliği). Demek ki |OA| = |OB| = |OC|.',
+   d:x=>{const O=circ(x.A,x.B,x.C);return ln(O,x.A,PU,1.8,'6 5')+ln(O,x.B,PU,1.8,'6 5')+ln(O,x.C,PU,1.8,'6 5')+tk(O,x.A)+tk(O,x.B)+tk(O,x.C)},
+   n:x=>{const O=circ(x.A,x.B,x.C);return row('|OA|',f(d(O,x.A)/U))+row('|OB|',f(d(O,x.B)/U))+row('|OC|',f(d(O,x.C)/U))}},
+  {t:'|OA| = |OC| olduğundan O, AC’nin orta dikmesi üzerindedir (orta dikmenin özelliğinin karşıtı). Böylece üç orta dikme O’da kesişir.',
+   d:x=>pbis(x.A,x.C,OR)+dot(mid(x.A,x.C),OR)},
+  {t:'O, üç köşeye de aynı R uzaklığındadır. O merkezli, R yarıçaplı çember A, B ve C’den geçer: çevrel çember. ∎',
+   d:x=>{const O=circ(x.A,x.B,x.C);return cir(O,d(O,x.A),BL,'',BL)+dot(O,BL,6)},
+   n:x=>{const O=circ(x.A,x.B,x.C);return row('R',f(d(O,x.A)/U))}}]},
+ per3:{mode:'per',title:'Dik üçgende çevrel merkez',small:'Çevrel merkez hipotenüsün orta noktasıdır',goal:'Dik üçgende O, hipotenüsün orta noktasıdır',req:REQ_DIK,steps:[
+  {t:x=>{const r=RTI(x);return `${r.nv} köşesi dik açıdır; hipotenüs ${r.np}${r.nq}. ${r.nv}${r.np} dik kenarının orta dikmesini çizelim. Bu doğru ${r.nv}${r.np}’ye dik, ${r.nv}${r.nq} de ${r.nv}${r.np}’ye dik olduğundan orta dikme ${r.nv}${r.nq}’ya paraleldir.`},
+   d:x=>{const r=RTI(x);return sq(r.V,unit(r.V,r.p),unit(r.V,r.q),12)+ln(r.p,r.q,BL,5)+pbis(r.V,r.p,OR)+dot(mid(r.V,r.p),OR)}},
+  {t:x=>{const r=RTI(x);return `Bir kenarın orta noktasından ikinci kenara paralel çizilen doğru üçüncü kenarı da ortalar (orta taban teoreminin karşıtı). Demek ki bu orta dikme hipotenüsü orta noktası M’de keser.`},
+   d:x=>{const r=RTI(x);return ln(mid(r.V,r.p),r.Mh,OR,4)+dot(r.Mh,GR,5.5)+lb(r.Mh,r.V,'M',GR,16)}},
+  {t:x=>{const r=RTI(x);return `${r.nv}${r.nq} kenarının orta dikmesi için aynı akıl yürütme geçerlidir: o da M’den geçer. İki orta dikme M’de kesiştiğinden çevrel merkez O = M’dir ve R = |${r.np}${r.nq}| / 2. ∎`},
+   d:x=>{const r=RTI(x);return pbis(r.V,r.q,OR)+dot(mid(r.V,r.q),OR)+ln(mid(r.V,r.q),r.Mh,OR,4)+cir(r.Mh,d(r.p,r.q)/2,BL,'',BL)+dot(r.Mh,BL,6)},
+   n:x=>{const r=RTI(x);return row('|M'+r.nv+'|',f(d(r.Mh,r.V)/U))+row('|M'+r.np+'|',f(d(r.Mh,r.p)/U))+row('|M'+r.nq+'|',f(d(r.Mh,r.q)/U))}}]},
+ /* ---------- YÜKSEKLİK ---------- */
+ alt1:{mode:'alt',title:'Yükseklikler tek noktada kesişir',small:'Üç yükseklik H diklik merkezinde kesişir',goal:'Üç yükseklik H noktasında kesişir',steps:[
+  {t:'Her köşeden karşı kenara paralel çizelim: A’dan BC’ye, B’den AC’ye, C’den AB’ye. Bu doğrular A′B′C′ adlı büyük bir üçgen oluşturur; ABC bunun içinde kalır.',
+   d:x=>{const q=APX(x);FIT.push(q.A2,q.B2,q.C2);return poly([q.A2,q.B2,q.C2],'none',PU,1,'7 5')+lb(q.A2,x.G,'A′',PU,22)+lb(q.B2,x.G,'B′',PU,22)+lb(q.C2,x.G,'C′',PU,22)}},
   {t:'ABCB′ ve ACBC′ birer paralelkenardır; bu yüzden |B′A| = |BC| = |AC′|. Yani A, B′C′ kenarının orta noktasıdır. Aynı şekilde B ve C de A′C′ ve A′B′ kenarlarının orta noktalarıdır.',
-   d:x=>{const {A,B,C}=x,B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y};return ln(B2,A,GR,6)+ln(A,C2,OR,6)+dot(A,PU,5)}},
-  {t:'AD ⟂ BC ve BC ∥ B′C′ olduğundan AD ⟂ B′C′ olur. Demek ki AD, B′C′ kenarının orta dikmesidir. Aynı şekilde BE ve CF de diğer kenarların orta dikmeleridir.',
-   d:x=>{const {A,B,C}=x,C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},Dd=foot(A,B,C),Ee=foot(B,A,C),Ff=foot(C,A,B);
-     return ln(A,Dd,GR,2.5)+ln(B,Ee,GR,2.5)+ln(C,Ff,GR,2.5)+sq(A,unit(A,C2),unit(A,Dd),9)+sq(B,unit(B,C2),unit(B,Ee),9)+sq(C,unit(C,B2),unit(C,Ff),9)}},
-  {t:'Üç yükseklik, A′B′C′ üçgeninin üç kenar orta dikmesidir. Bir üçgenin orta dikmeleri tek noktada (çevrel çember merkezi) kesiştiğinden yükseklikler de tek noktada kesişir: bu nokta H’dır. ∎',
-   d:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},H=circ(A2,B2,C2);FIT.push(H);
-     return ln(A,H,GR,2,'5 4')+ln(B,H,GR,2,'5 4')+ln(C,H,GR,2,'5 4')+cir(H,d(H,A2),PU,'6 5',PU)+dot(H,BL,6)+tx(H,'H',BL,14,-10)},
-   n:x=>{const {A,B,C}=x,A2={x:B.x+C.x-A.x,y:B.y+C.y-A.y},B2={x:A.x+C.x-B.x,y:A.y+C.y-B.y},C2={x:A.x+B.x-C.x,y:A.y+B.y-C.y},H=circ(A2,B2,C2);return row('|HA′|',f(d(H,A2)/U))+row('|HB′|',f(d(H,B2)/U))+row('|HC′|',f(d(H,C2)/U))}}]}
+   fade:1,
+   d:x=>{const q=APX(x);return poly([x.A,x.B,x.C,q.B2],GR,'none',.16)+poly([x.A,x.C,x.B,q.C2],OR,'none',.16)+ln(q.B2,x.A,GR,6)+ln(x.A,q.C2,OR,6)+tk(q.B2,x.A,1)+tk(x.A,q.C2,1)+tk(x.B,x.C,1)+dot(x.A,PU,5)},
+   n:x=>{const q=APX(x);return row('|B′A|',f(d(q.B2,x.A)/U))+row('|AC′|',f(d(x.A,q.C2)/U))+row('|BC|',f(x.a/U))}},
+  {t:'AD ⟂ BC ve BC ∥ B′C′ olduğundan AD ⟂ B′C′ olur. A, B′C′’nün orta noktası olduğundan AD, B′C′ kenarının orta dikmesidir. Aynı şekilde BE ve CF de diğer iki kenarın orta dikmeleridir.',
+   d:x=>{const q=APX(x);return altD(x.A,x.B,x.C,GR,'D')+altD(x.B,x.A,x.C,GR,'E')+altD(x.C,x.A,x.B,GR,'F')+sq(x.A,unit(x.A,q.C2),unit(x.A,foot(x.A,x.B,x.C)),9)+sq(x.B,unit(x.B,q.C2),unit(x.B,foot(x.B,x.A,x.C)),9)+sq(x.C,unit(x.C,q.B2),unit(x.C,foot(x.C,x.A,x.B)),9)}},
+  {t:'Üç yükseklik, A′B′C′ üçgeninin üç kenar orta dikmesidir. Bir üçgenin kenar orta dikmeleri tek noktada kesiştiğinden (çevrel çemberin merkezi) yükseklikler de tek noktada kesişir: bu nokta H’dır. ∎',
+   d:x=>{const q=APX(x),H=circ(q.A2,q.B2,q.C2);FIT.push(H);return ln(x.A,H,GR,2,'5 4')+ln(x.B,H,GR,2,'5 4')+ln(x.C,H,GR,2,'5 4')+cir(H,d(H,q.A2),PU,'6 5',PU)+dot(H,BL,6)+tx(H,'H',BL,14,-10)},
+   n:x=>{const q=APX(x),H=circ(q.A2,q.B2,q.C2);return row('|HA′|',f(d(H,q.A2)/U))+row('|HB′|',f(d(H,q.B2)/U))+row('|HC′|',f(d(H,q.C2)/U))}}]},
+ alt2:{mode:'alt',title:'Alan ve yükseklikler',small:'a·hₐ = b·h_b = c·h_c = 2·Alan',goal:'a·h_a = b·h_b = c·h_c = 2·Alan',steps:[
+  {t:'AD, BE ve CF yüksekliklerini çizelim. Her kenar bir taban olabilir ve o tabana ait bir yükseklik vardır.',
+   d:x=>altD(x.A,x.B,x.C,GR,'D')+altD(x.B,x.A,x.C,GR,'E')+altD(x.C,x.A,x.B,GR,'F')},
+  {t:'BC kenarını (a) taban seçersek yükseklik h_a = |AD| olur ve Alan = a·h_a / 2.',
+   fade:1,
+   d:x=>poly([x.A,x.B,x.C],BL,'none',.12)+ln(x.B,x.C,BL,6)+nl(x.B,x.C,x.A,'a',BL,20),
+   n:x=>{const F=foot(x.A,x.B,x.C);return row('Alan',f(x.K/(U*U)))+row('a·h_a / 2',f(x.a/U*d(x.A,F)/U/2))}},
+  {t:'AC kenarını (b) taban seçersek Alan = b·h_b / 2, AB kenarını (c) taban seçersek Alan = c·h_c / 2 olur. Üçgen aynı olduğundan alan her seferinde aynıdır.',
+   fade:1,
+   d:x=>ln(x.A,x.C,OR,6)+nl(x.A,x.C,x.B,'b',OR,20)+ln(x.A,x.B,PU,6)+nl(x.A,x.B,x.C,'c',PU,20),
+   n:x=>{const E=foot(x.B,x.A,x.C),F=foot(x.C,x.A,x.B);return row('b·h_b / 2',f(x.b/U*d(x.B,E)/U/2))+row('c·h_c / 2',f(x.c/U*d(x.C,F)/U/2))}},
+  {t:'a·h_a / 2 = b·h_b / 2 = c·h_c / 2 = Alan. Her yanı 2 ile çarparsak a·h_a = b·h_b = c·h_c = 2·Alan. Yani en uzun kenara ait yükseklik en kısadır. ∎',
+   d:x=>{const Fa=foot(x.A,x.B,x.C),Fb=foot(x.B,x.A,x.C),Fc=foot(x.C,x.A,x.B);return nl(x.A,Fa,x.G,'h_a',GR,14)+nl(x.B,Fb,x.G,'h_b',GR,14)+nl(x.C,Fc,x.G,'h_c',GR,14)},
+   n:x=>{const Fa=foot(x.A,x.B,x.C),Fb=foot(x.B,x.A,x.C),Fc=foot(x.C,x.A,x.B);return row('a·h_a',f(x.a/U*d(x.A,Fa)/U))+row('b·h_b',f(x.b/U*d(x.B,Fb)/U))+row('c·h_c',f(x.c/U*d(x.C,Fc)/U))+row('2·Alan',f(2*x.K/(U*U)))}}]},
+ alt3:{mode:'alt',title:'∠BHC = 180° − A',small:'Dar açılı üçgende iki yüksekliğin arasındaki açı',goal:'∠BHC = 180° − A',req:{ok:x=>Math.max(x.gA,x.gB,x.gC)<88,preset:'dar',msg:'Bu ispat dar açılı üçgen içindir (H üçgenin içinde olmalı). Düğmeyle dar açılı üçgene geçebilirsin.',btn:'Dar açılı üçgene geç'},steps:[
+  {t:'BE ⟂ AC ve CF ⟂ AB yükseklikleri H noktasında kesişsin (E, AC üzerinde; F, AB üzerinde). Kanıtlayacağımız şey: ∠BHC = 180° − A.',
+   d:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y};return altD(x.B,x.A,x.C,GR,'E')+altD(x.C,x.A,x.B,GR,'F')+dot(H,BL,6)+tx(H,'H',BL,14,-10)}},
+  {t:'AFHE dörtgeninde ∠AFH = 90° ve ∠AEH = 90° (yükseklikler). A köşesindeki açı da ∠A’dır.',
+   fade:1,
+   d:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y},E=foot(x.B,x.A,x.C),F=foot(x.C,x.A,x.B);return poly([x.A,F,H,E],OR,OR,.2)+arc2(x.A,x.B,x.C,30,OR)}},
+  {t:'Dörtgenin iç açıları toplamı 360° olduğundan ∠FHE = 360° − 90° − 90° − A = 180° − A.',
+   d:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y},E=foot(x.B,x.A,x.C),F=foot(x.C,x.A,x.B);return arc2(H,F,E,24,BL)},
+   n:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y},E=foot(x.B,x.A,x.C),F=foot(x.C,x.A,x.B);return row('∠FHE (ölçülen)',f(angAt(H,F,E),1)+'°')+row('180° − A',f(180-x.gA,1)+'°')}},
+  {t:'B–H–E ve C–H–F doğrusal olduğundan ∠BHC ile ∠FHE ters açılardır, yani eşittir: ∠BHC = ∠FHE = 180° − A. ∎',
+   d:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y};return arc2(H,x.B,x.C,24,BL)+arc2(H,x.B,x.C,29,BL)},
+   n:x=>{const O=circ(x.A,x.B,x.C),H={x:x.A.x+x.B.x+x.C.x-2*O.x,y:x.A.y+x.B.y+x.C.y-2*O.y};return row('∠BHC (ölçülen)',f(angAt(H,x.B,x.C),1)+'°')+row('180° − A',f(180-x.gA,1)+'°')}}]}
 };
-const whyCard=m=>card('Neden böyle?',Object.entries(PF).filter(([k,v])=>v.mode===m).map(([k,v])=>`<button class="why" data-pf="${k}">▶ ${v.title}<small>İspatı adım adım izle</small></button>`).join(''));
-const pfPanel=(D0,st,x)=>{const n=D0.steps.length,run=pfTimer&&pf.st<n-1;
-  return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs">${D0.steps.map((_,i)=>`<i class="${i<=pf.st?'on':''}"></i>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
+const whyCard=m=>card('Neden böyle?',Object.entries(PF).filter(([k,v])=>v.mode===m).map(([k,v])=>`<button class="why" data-pf="${k}">▶ ${v.title}<small>${v.small||'İspatı adım adım izle'}</small></button>`).join(''));
+const pfPanel=(D0,st,x)=>{const n=D0.steps.length,run=pfTimer&&pf.st<n-1,
+  rq=D0.req&&!D0.req.ok(x)?`<div class="warn"><p>${D0.req.msg}</p><button data-a="fix">${D0.req.btn}</button></div>`:'';
+  return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}${rq}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs">${D0.steps.map((_,i)=>`<i class="${i<=pf.st?'on':''}"></i>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
 
 let lastF=0,playId=0,HOME=null,LP=null,skipClick=0;
 function draw(){
@@ -324,8 +476,8 @@ function draw(){
   $('#chip').textContent=kind;
   const G={x:(A.x+B.x+C.x)/3,y:(A.y+B.y+C.y)/3};
   FIT=[...P];let s=poly(P,'var(--ink)','var(--ink)',.05),h='';
-  if(pf){const D0=PF[pf.id],cx={A,B,C,a,b,c,G,K},aw=anim;
-    for(let i=0;i<=pf.st;i++){anim=aw&&i===pf.st;s+=D0.steps[i].d(cx)}
+  if(pf){const D0=PF[pf.id],cx={A,B,C,a,b,c,G,K,gA,gB,gC},aw=anim;
+    for(let i=0;i<=pf.st;i++){anim=aw&&i===pf.st;const stp=D0.steps[i],gs=stp.d(cx);s+=(i<pf.st&&stp.fade)?`<g opacity=".3">${gs}</g>`:gs}
     anim=aw;h=pfPanel(D0,D0.steps[pf.st],cx)}
   if(!pf&&mode==='bis'){
     const o=on.bis,D=lerp(B,C,c/(b+c)),E=lerp(A,C,c/(c+a)),F=lerp(A,B,b/(a+b));
@@ -525,18 +677,20 @@ const dk=()=>RT.dataset.theme?RT.dataset.theme==='dark':mq.matches;
 const th=()=>{const d=dk();$('#theme').innerHTML=`<span aria-hidden="true">${d?'☀︎':'☾'}</span><span class="tl">&nbsp;${d?'Açık mod':'Koyu mod'}</span>`;$('#theme').setAttribute('aria-label',d?'Açık moda geç':'Koyu moda geç')};
 $('#theme').onclick=()=>{RT.dataset.theme=dk()?'light':'dark';th()};
 mq.addEventListener&&mq.addEventListener('change',()=>{if(!RT.dataset.theme)th()});
-function openPf(id){stopPlay();cancelAnimationFrame(raf);clearInterval(pfTimer);pfTimer=0;pf={id,st:0};$('#ctrls').style.display='none';document.body.classList.add('pfon');anim=true;draw();if(id==='alt1')$('#zfit').click();if(mqN.matches)setTimeout(()=>sv.scrollIntoView({behavior:'smooth',block:'start'}),60)}
-function closePf(silent){clearInterval(pfTimer);pfTimer=0;const id=pf&&pf.id;pf=null;$('#ctrls').style.display='';document.body.classList.remove('pfon');if(id==='alt1')$('#zrst').click();if(!silent){anim=true;draw()}}
+function openPf(id){stopPlay();cancelAnimationFrame(raf);pfStop();pf={id,st:0};$('#ctrls').style.display='none';document.body.classList.add('pfon');const D0=PF[id],g0=angs();if(D0.req&&!D0.req.ok({gA:g0[0],gB:g0[1],gC:g0[2]}))tween(curPR()[D0.req.preset]);anim=true;draw();if(id==='alt1')$('#zfit').click();if(mqN.matches)setTimeout(()=>sv.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+function closePf(silent){pfStop();const id=pf&&pf.id;pf=null;$('#ctrls').style.display='';document.body.classList.remove('pfon');if(id==='alt1')$('#zrst').click();if(!silent){anim=true;draw()}}
 function goStep(n){const N=PF[pf.id].steps.length;pf.st=Math.max(0,Math.min(N-1,n));anim=true;draw()}
-function pfStop(){clearInterval(pfTimer);pfTimer=0}
+function pfStop(){clearTimeout(pfTimer);clearInterval(pfTimer);pfTimer=0}
 function pfAuto(){
   if(pfTimer){pfStop();draw();return}
   const N=PF[pf.id].steps.length;if(pf.st>=N-1)pf.st=0;
-  pfTimer=setInterval(()=>{if(!pf||pf.st>=N-1){pfStop();draw();return}goStep(pf.st+1)},3400);
-  goStep(pf.st)}
+  const dly=()=>{const t=PF[pf.id].steps[pf.st].t;return Math.min(11000,3400+(typeof t==='string'?t.length*22:2600))};
+  const tick=()=>{if(!pf){pfStop();return}if(pf.st>=N-1){pfStop();draw();return}goStep(pf.st+1);pfTimer=setTimeout(tick,dly())};
+  goStep(pf.st);pfTimer=setTimeout(tick,dly())}
 $('#facts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.pf){openPf(b.dataset.pf);return}
   const a=b.dataset.a;if(!pf||!a)return;
+  if(a==='fix'){const R0=PF[pf.id].req;if(R0){pfStop();tween(curPR()[R0.preset])}return}
   if(a==='next'){pfStop();goStep(pf.st+1)}
   else if(a==='prev'){pfStop();goStep(pf.st-1)}
   else if(a==='auto')pfAuto();
