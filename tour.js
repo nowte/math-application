@@ -12,7 +12,7 @@ var RM=matchMedia('(prefers-reduced-motion:reduce)');
 
 /* ---------- Adımlar (xm: sadece mobilde gösterilen metin) ---------- */
 var STEPS=[
- {t:'Hoş geldin',
+ {t:'Hoş geldin ',
   x:'Bu sayfada üçgenin dört yardımcı elemanını canlı olarak keşfedeceksin: açıortay, kenarortay, kenar orta dik ve yükseklik. Kısa bir turla nasıl çalıştığına bakalım.',
   xm:'Üçgenin dört yardımcı elemanını (açıortay, kenarortay, kenar orta dik, yükseklik) canlı olarak keşfedeceksin. 30 saniyelik kısa bir tur yapalım.'},
  {s:'#tabs',t:'Bir eleman seç',
