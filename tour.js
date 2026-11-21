@@ -52,10 +52,13 @@ var STEPS=[
   x:'Formüller ve ölçülen değerler, köşeleri oynattıkça değişir. İki değerin hep eşit çıkması, özelliğin her üçgende geçerli olduğunu gösterir. “Neden böyle?” düğmesiyle ispatı adım adım izleyebilirsin.',
   xm:'Köşeleri oynattıkça formüller ve ölçülen değerler değişir. Eşit çıkan değerler özelliğin her üçgende geçerli olduğunu gösterir. “Neden böyle?” ile ispatı adım adım izle. Kaydırarak hepsini görebilirsin.',
   a:function(){proofStop();proofClose()}},
- {s:'#facts',t:'İspatı adım adım izle',up:1,
-  x:'İşte örnek bir ispat. “Oynat” adımları kendiliğinden ilerletir; çubuk bir sonraki adıma doğru akarak dolar. Önceki ve Sonraki düğmeleriyle kendin de geçebilirsin, Kapat ✕ ispatı kapatır.',
-  xm:'İşte örnek bir ispat. “Oynat” adımları kendiliğinden ilerletir; çubuk akarak dolar. Önceki ve Sonraki ile kendin de geçebilirsin.',
+ {s:'#facts',t:'İspatı adım adım izle',up:1,nb:1,
+  x:'İşte örnek bir ispat: çizim solda adım adım kurulur, açıklaması burada yazar. “Oynat” adımları kendiliğinden ilerletir; çubuk akarak dolar. Önceki ve Sonraki ile kendin de geçebilirsin, Kapat ✕ ispatı kapatır.',
+  xm:'İşte örnek bir ispat: çizim adım adım kurulur, açıklaması aşağıda yazar. “Oynat” kendiliğinden ilerletir; Önceki ve Sonraki ile kendin de geçebilirsin.',
   a:function(){proofStop();ensureProof(true);click('#facts [data-a="auto"]')}},
+ {s:'#presBtn',desk:1,t:'Sunum modu',
+  x:'Derste tahtaya ya da projeksiyona yansıtmak için: tam ekran, büyük yazı, kalem ve lazer işaretçi, ekranı karartma, saat ve sunum kumandasıyla (→ ← Boşluk) adım adım ilerleme. Kısayollar için sunum modunda H tuşuna bas.',
+  a:function(){proofStop();proofClose();tab('bis')}},
  {s:'#tourBtn',t:'Turu istediğin zaman aç',
   x:'Bu düğmeyle turu yeniden izleyebilirsin. İyi keşifler!',
   xm:'Bu düğmeyle turu yeniden izleyebilirsin. İyi keşifler!',
@@ -75,6 +78,9 @@ var css=
 '.tour .tt.sw{opacity:0}'+
 '.tour .tc{transition:opacity .18s ease,transform .18s ease}'+
 '.tour .tc.sw{opacity:0;transform:translateY(8px)}'+
+/* hedefin yanındaki çizimin görünmesi gereken adımlar: bulanıklık yok */
+'.tour .tp{transition:background .3s ease}'+
+'.tour.nb .tp{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(0,0,0,.16)}'+
 /* animasyonlu ilerleme çubuğu */
 '.tour .td{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:14px}'+
 '.tour .td b{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:var(--blue);transition:width .6s '+EZ+'}'+
@@ -141,6 +147,7 @@ if(acts)acts.insertBefore(btn,themeBtn||null);
 
 /* ---------- Yardımcılar ---------- */
 var S=STEPS;
+function active(){return STEPS.filter(function(s){return !(s.desk&&mob.matches)})}
 var i=-1,anim=0,raf=0,cur=null,swT=0,mT=0,endT=0,ro=null;
 var ease=function(k){return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2};
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -235,6 +242,7 @@ function swap(s,isCtr,m,first,whole){
   /* adıma özel eylem (sekme değiştir, ispat aç…) hedef ölçülmeden önce çalışır */
   if(s.a){try{s.a()}catch(e){}}
   var el=s.s&&$(s.s);
+  root.classList.toggle('nb',!!s.nb);
   var last=S.length-1,txt=m&&s.xm?s.xm:s.x,up=m&&s.up&&!isCtr;
   tT.textContent=s.t;
   tX.textContent=typeof txt==='function'?txt():txt;
@@ -263,7 +271,13 @@ function swap(s,isCtr,m,first,whole){
     else want=b.height>vh*.7?12:(vh-b.height)/2;
     y1=clamp(y0+b.top-want,0,Math.max(0,document.documentElement.scrollHeight-vh));
   }
-  var E1=el?rectOf(el,y1-y0):centerBox();
+  /* mobil ispat adımı: çizim, kart ile alttaki panelin arasına ortalanır */
+  if(m&&s.nb&&el){
+    var sv=$('.svw'),sb=sv&&sv.getBoundingClientRect(),ft=el.getBoundingClientRect().top;
+    if(sb){var rt=h1+16,rh=Math.max(0,ft-rt);
+      y1=clamp(y0+sb.top-(rt+Math.max(0,(rh-sb.height)/2)),0,Math.max(0,document.documentElement.scrollHeight-vh))}
+  }
+  var E1=el?rectOf(el,isFixed(el)?0:y1-y0):centerBox();
 
   /* masaüstü: kartı hedefin yanına kaydır (CSS geçişi) */
   if(!m){
@@ -296,6 +310,7 @@ function start(){
   if(typeof PRES!=='undefined'&&PRES&&typeof exitPres==='function')exitPres();
   if(typeof stopPlay==='function')stopPlay();
   clearTimeout(endT);
+  S=active();
   buildBar();
   lockPage(true);cur=null;
   tip.classList.remove('sw');tc.classList.remove('sw');
@@ -357,7 +372,7 @@ addEventListener('resize',function(){if(i>=0){lockPage(true);place()}});
 addEventListener('scroll',function(){if(i>=0&&!anim)place()},{passive:true});
 /* telefon ↔ masaüstü geçişinde adımı yeniden kur */
 (mob.addEventListener?mob.addEventListener.bind(mob,'change'):mob.addListener.bind(mob))(function(){
-  if(i>=0){lockPage(true);cur=null;show(i,true,true)}
+  if(i>=0){S=active();buildBar();lockPage(true);cur=null;show(Math.min(i,S.length-1),true,true)}
 });
 
 /* İlk ziyarette otomatik başlat */
