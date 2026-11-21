@@ -68,9 +68,9 @@ svg *{transition:none}
 .why small{display:block;font-weight:400;font-size:12px;color:var(--mute);margin-top:2px}
 .why:hover{border-color:var(--blue);color:var(--blue)}
 .pf .pst{font-size:13px;color:var(--blue);font-weight:600;margin:4px 0}
-.pgs{display:flex;gap:4px;margin-bottom:10px}
-.pgs i{flex:1;height:4px;border-radius:2px;background:var(--line)}
-.pgs i.on{background:var(--blue)}
+.pgs{position:relative;height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:10px}
+.pgf{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:var(--blue)}
+.pgs u{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--card)}
 .pcap{font-size:15px;line-height:1.55;margin:0 0 10px}
 .pbar{display:flex;gap:8px;margin-top:12px}
 .pbar button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:9px 8px;border-radius:980px;cursor:pointer}
@@ -465,8 +465,18 @@ const PF={
 const whyCard=m=>card('Neden böyle?',Object.entries(PF).filter(([k,v])=>v.mode===m).map(([k,v])=>`<button class="why" data-pf="${k}">▶ ${v.title}<small>${v.small||'İspatı adım adım izle'}</small></button>`).join(''));
 const pfPanel=(D0,st,x)=>{const n=D0.steps.length,run=pfTimer&&pf.st<n-1,
   rq=D0.req&&!D0.req.ok(x)?`<div class="warn"><p>${D0.req.msg}</p><button data-a="fix">${D0.req.btn}</button></div>`:'';
-  return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}${rq}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs">${D0.steps.map((_,i)=>`<i class="${i<=pf.st?'on':''}"></i>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
+  return `<div class="fc pf"><div class="pfh"><h3>İspat · ${D0.title}</h3><button class="pclose" data-a="close" aria-label="İspatı kapat">Kapat ✕</button></div>${fm(D0.goal)}${rq}<div class="pst">Adım ${pf.st+1} / ${n}</div><div class="pgs"><b class="pgf"></b>${D0.steps.slice(1).map((_,i)=>`<u style="left:${(i+1)/n*100}%"></u>`).join('')}</div><p class="pcap">${typeof st.t==='function'?st.t(x):st.t}</p>${st.n?st.n(x):''}<div class="pbar"><button data-a="prev" ${pf.st?'':'disabled'}>‹ Önceki</button><button data-a="auto">${run?'❚❚ Durdur':'▶ Oynat'}</button><button data-a="next" ${pf.st<n-1?'':'disabled'}>Sonraki ›</button></div></div>`};
 
+/* ===== İspat ilerleme çubuğu: durum tabanlı, yeniden çizimlerde bile akıcı ===== */
+const pfEase=k=>1-Math.pow(1-k,3);
+const noMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function pfFrac(){const b=pf&&pf.bar;if(!b)return 0;if(!b.dur)return b.to;const k=Math.min(1,(performance.now()-b.t0)/b.dur);return b.from+(b.to-b.from)*(b.lin?k:pfEase(k))}
+function pfBarTo(to,dur,lin){if(!pf)return;pf.bar={from:pfFrac(),to,t0:performance.now(),dur:noMotion()?0:dur,lin:!!lin}}
+function pfBarApply(){const f=$('#facts .pgf'),b=pf&&pf.bar;if(!f||!b)return;
+  const k=b.dur?Math.min(1,(performance.now()-b.t0)/b.dur):1,rem=b.dur*(1-k);
+  f.style.transition='none';f.style.width=(pfFrac()*100)+'%';
+  if(rem>16){void f.offsetWidth;f.style.transition=`width ${rem}ms ${b.lin?'linear':'cubic-bezier(.2,.7,.3,1)'}`;f.style.width=(b.to*100)+'%'}
+  else f.style.width=(b.to*100)+'%'}
 let lastF=0,playId=0,HOME=null,LP=null,skipClick=0;
 function draw(){
   const [A,B,C]=P,a=d(B,C),b=d(A,C),c=d(A,B),K=area(A,B,C),Ku=K/(U*U),au=a/U,bu=b/U,cu=c/U;
@@ -570,7 +580,8 @@ function draw(){
   $('#g').innerHTML=s;
   /* hareket sırasında bilgi kartını seyrek güncelle (telefonda donmayı önler) */
   if(!(playing&&!pf&&performance.now()-lastF<140)){$('#facts').innerHTML=subH(h);lastF=performance.now()}
-  if(anim){const fc=$('#facts');fc.classList.remove('fi');void fc.offsetWidth;fc.classList.add('fi')}
+  if(pf)pfBarApply();
+  if(anim&&!pf){const fc=$('#facts');fc.classList.remove('fi');void fc.offsetWidth;fc.classList.add('fi')}
   anim=false;
 }
 const INFO={
@@ -677,17 +688,21 @@ const dk=()=>RT.dataset.theme?RT.dataset.theme==='dark':mq.matches;
 const th=()=>{const d=dk();$('#theme').innerHTML=`<span aria-hidden="true">${d?'☀︎':'☾'}</span><span class="tl">&nbsp;${d?'Açık mod':'Koyu mod'}</span>`;$('#theme').setAttribute('aria-label',d?'Açık moda geç':'Koyu moda geç')};
 $('#theme').onclick=()=>{RT.dataset.theme=dk()?'light':'dark';th()};
 mq.addEventListener&&mq.addEventListener('change',()=>{if(!RT.dataset.theme)th()});
-function openPf(id){stopPlay();cancelAnimationFrame(raf);pfStop();pf={id,st:0};$('#ctrls').style.display='none';document.body.classList.add('pfon');const D0=PF[id],g0=angs();if(D0.req&&!D0.req.ok({gA:g0[0],gB:g0[1],gC:g0[2]}))tween(curPR()[D0.req.preset]);anim=true;draw();if(id==='alt1')$('#zfit').click();if(mqN.matches)setTimeout(()=>sv.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+function openPf(id){stopPlay();cancelAnimationFrame(raf);pfStop();pf={id,st:0,bar:null};pfBarTo(1/PF[id].steps.length,700);$('#ctrls').style.display='none';document.body.classList.add('pfon');const D0=PF[id],g0=angs();if(D0.req&&!D0.req.ok({gA:g0[0],gB:g0[1],gC:g0[2]}))tween(curPR()[D0.req.preset]);anim=true;draw();if(id==='alt1')$('#zfit').click();if(mqN.matches)setTimeout(()=>sv.scrollIntoView({behavior:'smooth',block:'start'}),60)}
 function closePf(silent){pfStop();const id=pf&&pf.id;pf=null;$('#ctrls').style.display='';document.body.classList.remove('pfon');if(id==='alt1')$('#zrst').click();if(!silent){anim=true;draw()}}
-function goStep(n){const N=PF[pf.id].steps.length;pf.st=Math.max(0,Math.min(N-1,n));anim=true;draw()}
-function pfStop(){clearTimeout(pfTimer);clearInterval(pfTimer);pfTimer=0}
+function goStep(n,creep){const N=PF[pf.id].steps.length;pf.st=Math.max(0,Math.min(N-1,n));
+  /* otomatik oynatmada çubuk, sonraki adıma doğru doğrusal akar; elle geçişte yumuşakça kayar */
+  if(creep&&pf.st<N-1&&pfFrac()<=(pf.st+2)/N+.001)pfBarTo((pf.st+2)/N,creep,1);else pfBarTo((pf.st+1)/N,650);
+  anim=true;draw()}
+function pfStop(){clearTimeout(pfTimer);clearInterval(pfTimer);pfTimer=0;if(pf&&pf.bar){const c=pfFrac();pf.bar={from:c,to:c,t0:0,dur:0}}}
 function pfAuto(){
   if(pfTimer){pfStop();draw();return}
   const N=PF[pf.id].steps.length;if(pf.st>=N-1)pf.st=0;
-  const dly=()=>{const t=PF[pf.id].steps[pf.st].t;return Math.min(8000,2200+(typeof t==='string'?t.length*14:1800))};
-  const tick=()=>{if(!pf){pfStop();return}if(pf.st>=N-1){pfStop();draw();return}goStep(pf.st+1);pfTimer=setTimeout(tick,dly())};
-  pfTimer=setTimeout(tick,pf.st===0?1500:800);
-  goStep(pf.st)}
+  const dly=k=>{const t=PF[pf.id].steps[k].t;return Math.min(8000,2200+(typeof t==='string'?t.length*14:1800))};
+  const tick=()=>{if(!pf){pfStop();return}if(pf.st>=N-1){pfStop();draw();return}const dl=dly(pf.st+1);goStep(pf.st+1,dl);pfTimer=setTimeout(tick,dl)};
+  const d0=pf.st===0?1500:800;
+  pfTimer=setTimeout(tick,d0);
+  goStep(pf.st,d0)}
 $('#facts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.pf){openPf(b.dataset.pf);return}
   const a=b.dataset.a;if(!pf||!a)return;
