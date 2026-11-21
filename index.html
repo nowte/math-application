@@ -684,9 +684,10 @@ function pfStop(){clearTimeout(pfTimer);clearInterval(pfTimer);pfTimer=0}
 function pfAuto(){
   if(pfTimer){pfStop();draw();return}
   const N=PF[pf.id].steps.length;if(pf.st>=N-1)pf.st=0;
-  const dly=()=>{const t=PF[pf.id].steps[pf.st].t;return Math.min(11000,3400+(typeof t==='string'?t.length*22:2600))};
+  const dly=()=>{const t=PF[pf.id].steps[pf.st].t;return Math.min(8000,2200+(typeof t==='string'?t.length*14:1800))};
   const tick=()=>{if(!pf){pfStop();return}if(pf.st>=N-1){pfStop();draw();return}goStep(pf.st+1);pfTimer=setTimeout(tick,dly())};
-  goStep(pf.st);pfTimer=setTimeout(tick,dly())}
+  pfTimer=setTimeout(tick,pf.st===0?1500:800);
+  goStep(pf.st)}
 $('#facts').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.pf){openPf(b.dataset.pf);return}
   const a=b.dataset.a;if(!pf||!a)return;
