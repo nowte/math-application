@@ -1,12 +1,12 @@
-/* Üçgenin Yardımcı Elemanları – tanıtım turları (v4)
-   - Ana tur + ayrı "İspat turu"
+/* Üçgenin Yardımcı Elemanları – tanıtım turu (v5)
+   - Ana turun içinde kısa bir ispat bölümü var
    - İlerleme çubuğu adımlar arasında akarak ilerler
    Kullanım: ana <script> bloğundan SONRA, </body> öncesine ekle:
    <script src="tour.js"></script>
 */
 (function(){
 'use strict';
-var KEY='ucgen-tur-v1',KEYP='ucgen-ispat-tur-v1';
+var KEY='ucgen-tur-v1';
 var $=function(s){return document.querySelector(s)};
 var mob=matchMedia('(max-width:600px)');
 var coarse=matchMedia('(pointer:coarse)');
@@ -21,11 +21,6 @@ function proofPlaying(){var b=$('#facts [data-a="auto"]');return !!b&&/Durdur/.t
 function proofStop(){if(proofPlaying())click('#facts [data-a="auto"]')}
 function ensureProof(fresh){
   if(fresh||!proofOpen()){proofClose();tab('bis');click('#facts .why[data-pf="bis3"]')}
-}
-function proofCounts(){
-  if(typeof PF==='undefined')return '';
-  var c={};Object.keys(PF).forEach(function(k){var m=PF[k].mode;c[m]=(c[m]||0)+1});
-  return 'Açıortay '+(c.bis||0)+', kenarortay '+(c.med||0)+', kenar orta dik '+(c.per||0)+', yükseklik '+(c.alt||0)+' ispat içerir. ';
 }
 function isFixed(el){
   for(var n=el;n&&n!==document.documentElement;n=n.parentElement){
@@ -55,44 +50,15 @@ var STEPS=[
   xm:'Anahtarlarla çizimdeki öğeleri aç ya da kapat. i düğmesi her öğeyi açıklar. Listenin tamamını görmek için yukarı aşağı kaydırabilirsin.'},
  {s:'#facts',t:'Sayılar canlı güncellenir',
   x:'Formüller ve ölçülen değerler, köşeleri oynattıkça değişir. İki değerin hep eşit çıkması, özelliğin her üçgende geçerli olduğunu gösterir. “Neden böyle?” düğmesiyle ispatı adım adım izleyebilirsin.',
-  xm:'Köşeleri oynattıkça formüller ve ölçülen değerler değişir. Eşit çıkan değerler özelliğin her üçgende geçerli olduğunu gösterir. “Neden böyle?” ile ispatı adım adım izle. Kaydırarak hepsini görebilirsin.'},
+  xm:'Köşeleri oynattıkça formüller ve ölçülen değerler değişir. Eşit çıkan değerler özelliğin her üçgende geçerli olduğunu gösterir. “Neden böyle?” ile ispatı adım adım izle. Kaydırarak hepsini görebilirsin.',
+  a:function(){proofStop();proofClose()}},
+ {s:'#facts',t:'İspatı adım adım izle',up:1,
+  x:'İşte örnek bir ispat. “Oynat” adımları kendiliğinden ilerletir; çubuk bir sonraki adıma doğru akarak dolar. Önceki ve Sonraki düğmeleriyle kendin de geçebilirsin, Kapat ✕ ispatı kapatır.',
+  xm:'İşte örnek bir ispat. “Oynat” adımları kendiliğinden ilerletir; çubuk akarak dolar. Önceki ve Sonraki ile kendin de geçebilirsin.',
+  a:function(){proofStop();ensureProof(true);click('#facts [data-a="auto"]')}},
  {s:'#tourBtn',t:'Turu istediğin zaman aç',
-  x:'Bu düğmeyle turu yeniden izleyebilirsin. İspatları ayrıca “İspat turu” düğmesiyle gezebilirsin. İyi keşifler!',
-  xm:'Bu düğmeyle turu yeniden izleyebilirsin. İspatlar için yanındaki “∴” düğmesini dene. İyi keşifler!'}
-];
-
-var PSTEPS=[
- {t:'İspat turu',
-  x:'Sayfadaki her özelliğin adım adım bir ispatı var. Kısa bir turla ispatları nasıl izleyeceğini gösterelim.',
-  xm:'Her özelliğin adım adım bir ispatı var. Kısa bir turla ispatları nasıl izleyeceğini gösterelim.',
-  a:function(){proofStop();proofClose();tab('bis')}},
- {s:'#facts .fc',t:'Neden böyle?',
-  x:function(){return proofCounts()+'Bir ispata dokunduğunda çizim, ispatın adımlarına göre sıfırdan kurulur.'},
-  xm:function(){return proofCounts()+'Bir ispata dokunduğunda çizim adım adım kurulur.'},
-  a:function(){proofStop();proofClose();tab('bis')}},
- {s:'.svw',t:'Çizim adım adım kurulur',
-  x:'İspat açılınca çizim her adımda yeni bir parça ekler: açıortay, dikmeler, eş üçgenler… Köşeleri oynatarak ispatın her üçgende geçerli olduğunu da görebilirsin.',
-  xm:'Çizim her adımda yeni bir parça ekler. Köşeleri oynatarak ispatın her üçgende geçerli olduğunu görebilirsin.',
-  a:function(){proofStop();ensureProof(true)}},
- {s:'#facts',t:'Adım açıklaması',up:1,
-  x:'Burada hedef, adım numarası ve o adımın gerekçesi yazar. Bazı adımlarda ölçülen değerler de görünür; köşeleri oynattıkça değişir ve eşit çıkar.',
-  xm:'Burada hedef, adım numarası ve gerekçe yazar. Ölçülen değerler köşeleri oynattıkça değişir ve eşit çıkar.',
-  a:function(){ensureProof(false)}},
- {s:'#facts',t:'Akıcı ilerleme çubuğu',up:1,
-  x:'“Oynat” ispatı kendiliğinden ilerletir. Üstteki çubuk adımlar arasında tak tak atlamaz, bir sonraki adıma doğru akarak dolar. Şu an oynatılıyor, izle.',
-  xm:'“Oynat” ispatı kendiliğinden ilerletir. Çubuk adımlar arasında atlamaz, bir sonraki adıma doğru akarak dolar. Şu an oynatılıyor.',
-  a:function(){ensureProof(false);if(!proofPlaying())click('#facts [data-a="auto"]')}},
- {s:'#facts .pbar',t:'Kendi hızında ilerle',up:1,
-  x:'Önceki ve Sonraki düğmeleriyle (ya da ← → tuşlarıyla) adımları kendin geçebilirsin; çubuk her seferinde yumuşakça kayar. Kapat ✕ ispatı kapatır.',
-  xm:'Önceki ve Sonraki ile adımları kendin geçebilirsin; çubuk yumuşakça kayar. Kapat ✕ ispatı kapatır.',
-  a:function(){ensureProof(false);proofStop()}},
- {s:'#tabs',t:'Her sekmenin ispatları',
-  x:function(){return proofCounts()+'Dik ya da dar açılı üçgen isteyen ispatlarda sayfa üçgeni senin için ayarlar.'},
-  xm:function(){return proofCounts()+'Gerekirse sayfa üçgeni senin için ayarlar.'},
-  a:function(){proofStop();proofClose();tab('med')}},
- {s:'#proofTourBtn',t:'Turu istediğin zaman aç',
-  x:'Bu düğmeyle ispat turunu yeniden izleyebilirsin. Keyifli ispatlar!',
-  xm:'Bu düğmeyle ispat turunu yeniden izleyebilirsin. Keyifli ispatlar!',
+  x:'Bu düğmeyle turu yeniden izleyebilirsin. İyi keşifler!',
+  xm:'Bu düğmeyle turu yeniden izleyebilirsin. İyi keşifler!',
   a:function(){proofStop();proofClose();tab('bis')}}
 ];
 
@@ -147,9 +113,9 @@ var css=
 '.tour .tt.ctr.sheet .tb{flex-direction:column}'+
 '.tour .tt.ctr.sheet .tb button.nx{order:1;width:100%;flex:none}'+
 '.tour .tt.ctr.sheet .tb button.sk{position:static;order:2;width:100%;flex:none;padding:0}'+
-/* başlık ile üst butonlar çakışmasın (üç buton: ? Tur, ∴ İspat turu, tema) */
-'@media(min-width:601px){h1{padding-right:520px!important}}'+
-'@media(max-width:600px){h1{padding-right:150px!important}}'+
+/* başlık ile üst butonlar çakışmasın */
+'@media(min-width:601px){h1{padding-right:400px!important}}'+
+'@media(max-width:600px){h1{padding-right:104px!important}}'+
 '@media(prefers-reduced-motion:reduce){.tour,.tour *{transition:none!important}}';
 var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
@@ -170,14 +136,11 @@ var tps=[].slice.call(root.querySelectorAll('.tp')),ring=root.querySelector('.tr
 var btn=document.createElement('button');
 btn.className='theme';btn.id='tourBtn';btn.type='button';btn.setAttribute('aria-label','Turu başlat');
 btn.innerHTML='<span aria-hidden="true">?</span><span class="tl">&nbsp;Tur</span>';
-var btnP=document.createElement('button');
-btnP.className='theme';btnP.id='proofTourBtn';btnP.type='button';btnP.setAttribute('aria-label','İspat turunu başlat');
-btnP.innerHTML='<span aria-hidden="true">∴</span><span class="tl">&nbsp;İspat turu</span>';
 var acts=$('.acts'),themeBtn=$('#theme');
-if(acts){acts.insertBefore(btn,themeBtn||null);acts.insertBefore(btnP,themeBtn||null)}
+if(acts)acts.insertBefore(btn,themeBtn||null);
 
 /* ---------- Yardımcılar ---------- */
-var S=STEPS,K=KEY,launcher=btn;
+var S=STEPS;
 var i=-1,anim=0,raf=0,cur=null,swT=0,mT=0,endT=0,ro=null;
 var ease=function(k){return k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2};
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -328,12 +291,10 @@ function lockPage(on){
   }
 }
 
-function start(which){
+function start(){
   if(i>=0)return;
   if(typeof PRES!=='undefined'&&PRES&&typeof exitPres==='function')exitPres();
   if(typeof stopPlay==='function')stopPlay();
-  var proof=which==='proof';
-  S=proof?PSTEPS:STEPS;K=proof?KEYP:KEY;launcher=proof?btnP:btn;
   clearTimeout(endT);
   buildBar();
   lockPage(true);cur=null;
@@ -348,18 +309,17 @@ function start(which){
 }
 function end(){
   clearTimeout(swT);cancelAnimationFrame(raf);anim=0;
-  var wasProof=S===PSTEPS;
   i=-1;
   if(ro){ro.disconnect();ro=null}
   root.classList.remove('vis');
-  try{localStorage.setItem(K,'1')}catch(e){}
-  if(wasProof){try{proofStop();proofClose();tab('bis')}catch(e){}}
+  try{localStorage.setItem(KEY,'1')}catch(e){}
+  try{proofStop();proofClose();tab('bis')}catch(e){}
   try{scrollTo({top:0,behavior:RM.matches?'auto':'smooth'})}catch(e){scrollTo(0,0)}
   endT=setTimeout(function(){
     root.classList.remove('on');
     document.body.style.overflow='';document.body.style.paddingBottom='';
   },RM.matches?0:360);
-  try{launcher.focus({preventScroll:true})}catch(e){}
+  try{btn.focus({preventScroll:true})}catch(e){}
 }
 function next(){i===S.length-1?end():show(i+1)}
 
@@ -370,8 +330,7 @@ root.addEventListener('click',function(e){
   else if(a==='prev')show(i-1);
   else if(a==='skip')end();
 });
-btn.addEventListener('click',function(){start('main')});
-btnP.addEventListener('click',function(){start('proof')});
+btn.addEventListener('click',start);
 
 /* yana kaydırma: sola = ileri, sağa = geri (mobil panel üzerinde) */
 var sx=0,sy=0;
@@ -401,8 +360,8 @@ addEventListener('scroll',function(){if(i>=0&&!anim)place()},{passive:true});
   if(i>=0){lockPage(true);cur=null;show(i,true,true)}
 });
 
-/* İlk ziyarette ana turu otomatik başlat (ispat turu sadece düğmeyle açılır) */
+/* İlk ziyarette otomatik başlat */
 var seen=null;
 try{seen=localStorage.getItem(KEY)}catch(e){}
-if(!seen)setTimeout(function(){start('main')},500);
+if(!seen)setTimeout(start,500);
 })();
