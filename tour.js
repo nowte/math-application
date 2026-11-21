@@ -114,8 +114,8 @@ var css=
 '.tour .tt.ctr.sheet .tb button.nx{order:1;width:100%;flex:none}'+
 '.tour .tt.ctr.sheet .tb button.sk{position:static;order:2;width:100%;flex:none;padding:0}'+
 /* başlık ile üst butonlar çakışmasın */
-'@media(min-width:601px){h1{padding-right:400px!important}}'+
-'@media(max-width:600px){h1{padding-right:104px!important}}'+
+'@media(min-width:601px){body:not(.pres) h1{padding-right:400px!important}}'+
+'@media(max-width:600px){body:not(.pres) h1{padding-right:104px!important}}'+
 '@media(prefers-reduced-motion:reduce){.tour,.tour *{transition:none!important}}';
 var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 
